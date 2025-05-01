@@ -1,5 +1,66 @@
 {%extends './menu-admin.html'%}
 {%block title%}Administrar Competencia{%endblock%}
 {%block content%}
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-competencia.css') }}">
+<div class="contenido">
+    <div class="bloque">
+      <h2>PROCESO DE INSCRIPCIÓN</h2>
+      <div class="fechas">
+        <div>
+          <label>Fecha Inicio:</label>
+          <input type="date" name="fechaIniIns">
+        </div>
+        <div>
+          <label>Fecha Fin:</label>
+          <input type="date" name="fechaFinIns">
+        </div>
+      </div>
+    </div>
+  
+    <div class="bloque">
+      <h2>PROCESO DE VALIDACIÓN DE INSCRIPCIÓN</h2>
+      <div class="fechas">
+        <div>
+          <label>Fecha Inicio:</label>
+          <input type="date" name="fechaIniVal">
+        </div>
+        <div>
+          <label>Fecha Fin:</label>
+          <input type="date" name="fechaFinVal">
+        </div>
+      </div>
+    </div>
+  
+    <div class="bloque">
+      <h2>PROCESO DE PAGOS DE INSCRIPCIÓN</h2>
+      <div class="fechas">
+        <div>
+          <label>Fecha Inicio:</label>
+          <input type="date" name="fechaIniPag">
+        </div>
+        <div>
+          <label>Fecha Fin:</label>
+          <input type="date" name="fechaFinPag">
+        </div>
+      </div>
+    </div>
+  
+    <div class="bloque">
+      <h2>PERIODO DE COMPETENCIA</h2>
+      <div class="fechas">
+        <div>
+          <label>Fecha Inicio:</label>
+          <input type="date" name="fechaIniComp">
+        </div>
+        <div>
+          <label>Fecha Fin:</label>
+          <input type="date" name="fechaFinComp">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="contenedor-boton">
+    <button class="boton" type="submit">Guardar</button>
+  </div>
 {%endblock content%}

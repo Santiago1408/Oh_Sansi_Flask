@@ -2,20 +2,16 @@ body{
     margin: 0;
 }
 
-.formulario{
-    background-color: #FFFFFF;
-    color: #212756;
+.comp{
+    margin-left: 80px;
 }
 
-.formulario h2{
-    margin: 0;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    padding: 10px;
+.formulario{
+    color: #212756;
 }
 
 .formulario p{
     margin: 0;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     padding: 10px 0;
     font-size: 20px;
 }
@@ -30,15 +26,13 @@ body{
 }
 
 .seccion1, .seccion2{
+    margin-left: 80px;
     position: relative;
     width: 50%;
-    padding: 10px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 input[type="text"], input[type="email"], input[type="number"], input[type="date"], select{
     width: 80%;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     padding: 10px;
     border: solid 1px #212756;
     border-radius: 5px;
@@ -55,12 +49,13 @@ select{
     padding: 8px;
     display: flex;
     justify-content: center;
-    margin: 0 10%;
+    margin: 30px 10%;
     flex-wrap: wrap;
     font-size: medium;
     font-family: Arial, sans-serif;
     border: 2px black solid;
     border-radius: 5%;
+    
 }
 .botones{
     display: flex;

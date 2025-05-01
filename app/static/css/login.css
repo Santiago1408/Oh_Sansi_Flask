@@ -52,10 +52,22 @@ input[type="submit"]{
     font-size: 20px;
     cursor: pointer;
     margin: 0px auto;
-    margin-top: 20px;
     width: 90%;
 }
 input[type="submit"]:hover{
     background-color: #00bbff;
     border: none;
+}
+
+.crear-cuenta{
+    display: flex;
+    flex-direction: row-reverse;
+    width: 80%;
+    margin: 15px auto;
+    color: #212756;
+}
+
+.crear-cuenta a:hover{
+    color: #00bbff;
+    transition: 0.3s;
 }

@@ -45,3 +45,18 @@ body{
     margin: 0;
     padding: 0;
 }
+
+i{
+    font-size: 30px;
+    margin-right: 40px;
+}
+
+#admin{
+    padding: 0 10px;
+}
+
+#admin:hover{
+    color:#000;
+    cursor: default;
+}
+
