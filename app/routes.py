@@ -1,5 +1,5 @@
 from app import app, mysql
-from flask import render_template, jsonify
+from flask import render_template, jsonify, request
 
 @app.route('/')
 def home():
@@ -28,3 +28,11 @@ def adminreportes():
 @app.route('/admin-competencia')
 def admincompetencia():
     return render_template('admin-competencia.html')
+
+@app.route('/inscribirse')
+def inscribirse():
+    return render_template('form-competidor.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')

@@ -11,13 +11,13 @@
     <header>
         <div class="logo">
             <img src="{{url_for('static', filename='images/logo-sansi.png')}}" alt="">
-            <h1 class="oh-sansi"><a href="">Oh! Sansi</a></h1>
+            <h1 class="oh-sansi"><a href="{{url_for('home')}}">Oh! Sansi</a></h1>
         </div>
         <nav>
-            <a href="{{url_for('adminareas')}}" class="nav-link">Administrador</a>
-            <a href="{{url_for('cajero')}}" class="nav-link">Cajero</a>
-            <a href="{{url_for('tutor')}}" class="nav-link">Tutor</a>
-            <a href="{{url_for('inscripcion')}}" class="nav-link" id="inscripcion">Inscripción</a>
+            <a href="{{url_for('login')}}" class="nav-link">Administrador</a>
+            <a href="{{url_for('login')}}" class="nav-link">Cajero</a>
+            <a href="{{url_for('login')}}" class="nav-link">Tutor</a>
+            <a href="{{url_for('inscribirse')}}" class="nav-link" id="inscripcion">Inscripción</a>
         </nav>
     </header>
     {% block content %}
