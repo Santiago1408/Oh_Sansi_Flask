@@ -11,7 +11,7 @@
           <p>
               Matemáticas, Física, Química, Biología, Astronomía y Astrofísica, Informática, Robótica
           </p>
-          <input type="button" id="insc" value="Inscribirse">
+          <input type="button" id="insc" value="Inscribirse" onclick="location.href='{{ url_for('inscribirse') }}'">
       </div>
       <div class="mascota">
           <img src="{{url_for('static', filename='images/robot-sansi.png')}}" alt="Hola Sansi">

@@ -36,3 +36,7 @@ def inscribirse():
 @app.route('/login')
 def login():
     return render_template('login.html')
+
+@app.route('/registrarse')
+def registrarse():
+    return render_template('registro.html')
