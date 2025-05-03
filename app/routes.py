@@ -60,9 +60,9 @@ def procesar_inscripcion():
 
         # Insertar en tabla Competidor
         cur.execute("""
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombres, apellidos, email, telefono))
+        """, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombres, apellidos, email, telefono, "pendiente"))
         
         # Obtener el ID del competidor recién insertado
         mysql.connection.commit()
