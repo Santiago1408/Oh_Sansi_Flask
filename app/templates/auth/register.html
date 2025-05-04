@@ -1,0 +1,161 @@
+{% extends './menu-home.html' %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+
+<div class="formulario">
+    <h2 id="titFormulario">Registro</h2>
+    <form action="#" method="POST" id="formularioRegistro">
+        <div class="campos">
+            <!-- Sección 1 -->
+            <div class="seccion1">
+                <p>Nombres:</p>
+                <input type="text" name="nombres" id="nombres" maxlength="50" required>
+                <span id="nombres-error" class="error-message"></span>
+                <p>Apellidos:</p>
+                <input type="text" name="apellidos" id="apellidos" maxlength="50" required>
+                <span id="apellidos-error" class="error-message"></span>
+                <p>Fecha de Nacimiento:</p>
+                <input type="date" name="fechaNacimiento" id="fechaNacimiento" required>
+                <span id="fechaNacimiento-error" class="error-message"></span>
+                <p>Carnet de Identidad:</p>
+                <input type="text" name="ci" id="ci" maxlength="12" required>
+                <span id="ci-error" class="error-message"></span>
+                <p>Correo Electrónico:</p>
+                <input type="email" name="email" id="email" maxlength="100" required>
+                <span id="email-error" class="error-message"></span>
+                <p>Número de Celular:</p>
+                <input type="number" name="numCelular" id="numCelular" required>
+                <span id="numCelular-error" class="error-message"></span>
+            </div>
+            <!-- Sección 2 -->
+            <div class="seccion2">
+                <p>Rol:</p>
+                <p class="mensaje-rol">Por favor escoja el rol que desee para la cuenta</p>
+                <select name="rol" id="rol" required>
+                    <option value="" disabled selected>Seleccione un rol</option>
+                    <option value="Tutor">Tutor</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Cajero">Cajero</option>
+                </select>
+                <span id="rol-error" class="error-message"></span>
+                <p>Contraseña:</p>
+                <input type="password" name="password" id="password" required>
+                <span id="password-error" class="error-message"></span>
+                <p>Verificar Contraseña:</p>
+                <input type="password" name="confirm_password" id="confirm_password" required>
+                <span id="error-message" class="error-message"></span>
+                <div class="botones">
+                    <input type="reset" value="Cancelar">
+                    <input type="submit" value="Registrarse">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    document.getElementById('formularioRegistro').addEventListener('submit', function (event) {
+        let valid = true;
+
+        const nombres = document.getElementById('nombres').value.trim();
+        const apellidos = document.getElementById('apellidos').value.trim();
+        const nombreApellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+
+        if (!nombreApellidoRegex.test(nombres)) {
+            document.getElementById('nombres-error').textContent = 'Ingrese un nombre válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            document.getElementById('nombres-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('nombres-error').style.display = 'none';
+        }
+
+        if (!nombreApellidoRegex.test(apellidos)) {
+            document.getElementById('apellidos-error').textContent = 'Ingrese un apellido válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            document.getElementById('apellidos-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('apellidos-error').style.display = 'none';
+        }
+
+        const fechaNacimiento = new Date(document.getElementById('fechaNacimiento').value);
+        const hoy = new Date();
+        const edadMinima = 18;
+        const edadMaxima = 100;
+        const edadActual = hoy.getFullYear() - fechaNacimiento.getFullYear();
+
+        if (fechaNacimiento > hoy || edadActual < edadMinima || edadActual > edadMaxima) {
+            document.getElementById('fechaNacimiento-error').textContent = 'Debe tener entre 18 y 100 años.';
+            document.getElementById('fechaNacimiento-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('fechaNacimiento-error').style.display = 'none';
+        }
+
+        const ci = document.getElementById('ci').value.trim();
+        const ciRegex = /^\d{5,11}(-[A-Za-z\d]{1,2})?$/;
+
+        if (!ciRegex.test(ci)) {
+            document.getElementById('ci-error').textContent = 'Ingrese un CI válido (ejemplo: 123456-1A o solo números).';
+            document.getElementById('ci-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('ci-error').style.display = 'none';
+        }
+
+        const email = document.getElementById('email').value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            document.getElementById('email-error').textContent = 'Ingrese un correo electrónico válido.';
+            document.getElementById('email-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('email-error').style.display = 'none';
+        }
+
+        const numCelular = document.getElementById('numCelular').value.trim();
+        const numCelularRegex = /^[67]\d{7}$/;
+
+        if (!numCelularRegex.test(numCelular)) {
+            document.getElementById('numCelular-error').textContent = 'Ingrese un número de celular válido (8 dígitos, comenzando con 6 o 7).';
+            document.getElementById('numCelular-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('numCelular-error').style.display = 'none';
+        }
+
+        const rol = document.getElementById('rol').value;
+        if (!['Tutor', 'Administrador', 'Cajero'].includes(rol)) {
+            document.getElementById('rol-error').textContent = 'Seleccione un rol válido.';
+            document.getElementById('rol-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('rol-error').style.display = 'none';
+        }
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>,.?~`|{}[\]\\-])[A-Za-z\d!@#$%^&*()_+=<>,.?~`|{}[\]\\-]{8,}$/;
+
+        if (!passwordRequirements.test(password)) {
+            document.getElementById('password-error').textContent = 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial permitido.';
+            document.getElementById('password-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        if (password !== confirmPassword) {
+            document.getElementById('error-message').textContent = 'Las contraseñas no coinciden.';
+            document.getElementById('error-message').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

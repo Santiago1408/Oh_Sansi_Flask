@@ -92,3 +92,7 @@ def procesar_inscripcion():
         mysql.connection.rollback()
         flash(f'Error al procesar inscripción: {str(e)}')
         return redirect(url_for('inscribirse'))
+    
+@app.route('/register')
+def register():
+    return render_template('auth/register.html')

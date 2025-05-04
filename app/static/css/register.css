@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+}
+
+.comp {
+  margin-left: 80px;
+}
+
+.formulario {
+  color: #212756;
+}
+
+.formulario p {
+  margin: 0;
+  padding: 10px 0;
+  font-size: 20px;
+}
+
+#titFormulario {
+  text-align: center;
+  padding: 15px;
+}
+
+.campos {
+  display: flex;
+}
+
+.seccion1,
+.seccion2 {
+  margin-left: 80px;
+  position: relative;
+  width: 50%;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select {
+  width: 80%;
+  padding: 10px;
+  border: solid 1px #212756;
+  border-radius: 5px;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+select {
+  width: 83%;
+}
+
+.botones {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 30px 17% 40px 40px;
+}
+
+input[type="submit"],
+input[type="reset"] {
+  background-color: #212756;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+  background-color: #00bbff;
+  transition: 0.3s;
+}
+
+.mensaje-rol {
+  font-size: 15px !important;
+  color: #555;
+}
+
+.error-message {
+  color: red;
+  font-size: 15px !important;
+  margin-top: 5px;
+  display: none;
+}
