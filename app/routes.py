@@ -3,6 +3,11 @@ from flask import render_template, jsonify, request
 
 @app.route('/')
 def home():
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * FROM competencia"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print(data)
     return render_template('home.html')
 
 @app.route('/admin-areas')

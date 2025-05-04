@@ -13,6 +13,3 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 from app import routes
-
-
-
