@@ -3,9 +3,29 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 
+
+
 <div class="formulario">
     <h2 id="titFormulario">Registro</h2>
-    <form action="#" method="POST" id="formularioRegistro">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flashed-messages">
+        <ul>
+            {% for category, message in messages %}
+            <li class="{{ category }}">
+                <div class="message-wrapper">
+                    <span class="close-btn" onclick="this.closest('.flashed-messages').style.display='none';">
+                        &times;
+                    </span>
+                    {{ message }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('register') }}" method="POST" id="formularioRegistro">
         <div class="campos">
             <!-- Sección 1 -->
             <div class="seccion1">
