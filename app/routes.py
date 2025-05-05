@@ -258,3 +258,140 @@ def registrar_competidor():
         return redirect(url_for('login'))
         
     return redirect(url_for('inscribirse'))
+
+@app.route('/admin-competencia/registrar', methods=['POST'])
+@admin_required
+def registrar_competencia():
+    grado = request.form['grado']
+    area = request.form['area']
+    categoria = request.form['categoria']
+    
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO Competencia (grado, area, categoria) VALUES (%s, %s, %s)",
+            (grado, area, categoria)
+        )
+        mysql.connection.commit()
+        return jsonify({'success': True, 'message': 'Competencia registrada exitosamente!'})
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'success': False, 'message': f'Error al registrar competencia: {str(e)}'})
+    finally:
+        cursor.close()
+
+@app.route('/admin-competencia/eliminar/<int:id>', methods=['DELETE'])
+@admin_required
+def eliminar_competencia(id):
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("DELETE FROM Competencia WHERE id_competencia = %s", (id,))
+        mysql.connection.commit()
+        return jsonify({'success': True, 'message': 'Competencia eliminada exitosamente!'})
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'success': False, 'message': f'Error al eliminar competencia: {str(e)}'})
+    finally:
+        cursor.close()
+
+
+@app.route('/admin-competencia/filtrar', methods=['POST'])
+@admin_required
+def filtrar_competencias():
+    # Obtener parámetros de filtrado
+    filtros = {
+        'grado': request.form.get('filtro_grado', None),
+        'area': request.form.get('filtro_area', None),
+        'categoria': request.form.get('filtro_categoria', None)
+    }
+
+    # Convertir valores vacíos a None
+    for key in filtros:
+        if filtros[key] == '':
+            filtros[key] = None
+
+    cursor = mysql.connection.cursor()
+    try:
+        query = "SELECT id_competencia, grado, area, categoria FROM Competencia WHERE 1=1"
+        params = []
+        
+        if filtros['grado']:
+            query += " AND grado = %s"
+            params.append(filtros['grado'])
+        if filtros['area']:
+            query += " AND area = %s"
+            params.append(filtros['area'])
+        if filtros['categoria']:
+            query += " AND categoria = %s"
+            params.append(filtros['categoria'])
+            
+        cursor.execute(query, params)
+        competencias = cursor.fetchall()
+        
+        competencias_list = []
+        for comp in competencias:
+            competencias_list.append({
+                'id': comp[0],
+                'grado': comp[1],
+                'area': comp[2],
+                'categoria': comp[3],
+                'texto': f"{comp[1]} - {comp[2]} - {comp[3]}"
+            })
+            
+        return jsonify({
+            'success': True,
+            'competencias': competencias_list,
+            'filtros': filtros
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
+    finally:
+        cursor.close()
+
+# Modificamos la ruta admincompetencia para manejar GET
+@app.route('/admin-competencia', methods=['GET'])
+@admin_required
+def admincompetencia():
+    cursor = mysql.connection.cursor()
+    try:
+        # Obtener valores únicos para los filtros
+        cursor.execute("SELECT DISTINCT grado FROM Competencia")
+        grados = [row[0] for row in cursor.fetchall()]
+        
+        cursor.execute("SELECT DISTINCT area FROM Competencia")
+        areas = [row[0] for row in cursor.fetchall()]
+        
+        cursor.execute("SELECT DISTINCT categoria FROM Competencia")
+        categorias = [row[0] for row in cursor.fetchall()]
+        
+        # Obtener todas las competencias inicialmente
+        cursor.execute("SELECT id_competencia, grado, area, categoria FROM Competencia")
+        competencias = cursor.fetchall()
+        
+        competencias_list = []
+        for comp in competencias:
+            competencias_list.append({
+                'id': comp[0],
+                'grado': comp[1],
+                'area': comp[2],
+                'categoria': comp[3]
+            })
+            
+        return render_template('admin-competencia.html', 
+                            competencias=competencias_list,
+                            grados=grados,
+                            areas=areas,
+                            categorias=categorias)
+        
+    except Exception as e:
+        flash(f'Error al cargar competencias: {str(e)}', 'error')
+        return render_template('admin-competencia.html', 
+                            competencias=[],
+                            grados=[],
+                            areas=[],
+                            categorias=[])
+    finally:
+        cursor.close()
