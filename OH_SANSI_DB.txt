@@ -1,0 +1,94 @@
+-- Eliminar tablas si existen (en orden de dependencias)
+DROP TABLE IF EXISTS Compite;
+DROP TABLE IF EXISTS Puede_Tener;
+DROP TABLE IF EXISTS Inscripcion;
+DROP TABLE IF EXISTS Cajero;
+DROP TABLE IF EXISTS Administrador;
+DROP TABLE IF EXISTS Tutor;
+DROP TABLE IF EXISTS Competidor;
+DROP TABLE IF EXISTS Competencia;
+DROP TABLE IF EXISTS Usuario;
+
+-- Crear tabla Usuario
+CREATE TABLE Usuario (
+    id_usuario INT PRIMARY KEY,
+    nombre VARCHAR(50),
+    apellido VARCHAR(50),
+    email VARCHAR(50),
+    telefono VARCHAR(10),
+    contrasenia VARCHAR(50),
+    rol VARCHAR(20)
+);
+
+-- Crear tabla Competidor
+CREATE TABLE Competidor (
+    id_competidor INT PRIMARY KEY,
+    ci VARCHAR(10),
+    fecha_nacimiento DATE,
+    colegio VARCHAR(50),
+    curso VARCHAR(50),
+    departamento VARCHAR(50),
+    provincia VARCHAR(50),
+    nombre VARCHAR(50),
+    apellido VARCHAR(50),
+    email VARCHAR(50),
+    telefono VARCHAR(8)
+);
+
+-- Crear tabla Tutor
+CREATE TABLE Tutor (
+    id_tutor INT PRIMARY KEY,
+    id_usuario INT,
+    tipo_tutor VARCHAR(50),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+
+-- Crear tabla Inscripcion
+CREATE TABLE Inscripcion (
+    id_inscripcion INT PRIMARY KEY,
+    id_competidor INT,
+    id_tutor INT,
+    fecha_inscripcion DATE,
+    FOREIGN KEY (id_competidor) REFERENCES Competidor(id_competidor),
+    FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor)
+);
+
+-- Crear tabla Administrador
+CREATE TABLE Administrador (
+    id_administrador INT PRIMARY KEY,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+
+-- Crear tabla Cajero
+CREATE TABLE Cajero (
+    id_cajero INT PRIMARY KEY,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+
+-- Crear tabla Competencia
+CREATE TABLE Competencia (
+    id_competencia INT PRIMARY KEY,
+    area VARCHAR(50),
+    categoria VARCHAR(50),
+    grado VARCHAR(50)
+);
+
+-- Crear tabla Puede_Tener (relación muchos a muchos Tutor-Competidor)
+CREATE TABLE Puede_Tener (
+    id_tutor INT,
+    id_competidor INT,
+    PRIMARY KEY (id_tutor, id_competidor),
+    FOREIGN KEY (id_tutor) REFERENCES Tutor(id_tutor),
+    FOREIGN KEY (id_competidor) REFERENCES Competidor(id_competidor)
+);
+
+-- Crear tabla Compite (relación muchos a muchos Competencia-Competidor)
+CREATE TABLE Compite (
+    id_competencia INT,
+    id_competidor INT,
+    PRIMARY KEY (id_competencia, id_competidor),
+    FOREIGN KEY (id_competencia) REFERENCES Competencia(id_competencia),
+    FOREIGN KEY (id_competidor) REFERENCES Competidor(id_competidor)
+);

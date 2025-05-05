@@ -1,0 +1,57 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.campo {
+    background-color: #ededed;
+    padding: 30px;
+    width: fit-content;
+    margin: 50px auto;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .info-total p {
+    margin: 5px 0;
+    font-size: 25px;
+  }
+  
+  .cantidad {
+    font-weight: bold;
+    font-size: 25px;
+  }
+  
+  .selector {
+    margin: 20px 0;
+  }
+  
+  .selector label {
+    margin-right: 10px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .curso {
+    padding: 8px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .Generar {
+    background-color: #1E3656;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  
+  .Generar:hover {
+    background-color: #080213;
+  }

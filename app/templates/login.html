@@ -1,0 +1,35 @@
+{%extends './menu-home.html'%}
+{%block title%}Login{%endblock%}
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<div class="formulario">
+    <div class="info">
+        <h1>Iniciar Sesión</h1>
+        <p style="font-size: 20px; margin: 0;">Bienvenido a Oh! Sansi</p>
+    </div>
+    <form action="{{url_for('login')}}" method="POST" class="campos">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div id="error" class="alert alert-{{ category if category != 'error' else 'danger' }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <div class="input">
+            <p>E-mail</p>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div class="input">
+            <p>Contraseña</p>
+            <input type="password" name="password" id="password" required>
+        <div class="crear-cuenta">
+            <a href="{{url_for('registrarse')}}">Crear cuenta</a>
+        </div>
+        <div class="botones">
+            <input type="submit" value="Iniciar Sesión">
+        </div>
+    </form> 
+</div>
+{%endblock%}

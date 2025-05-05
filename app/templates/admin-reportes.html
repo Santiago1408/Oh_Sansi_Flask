@@ -1,0 +1,29 @@
+{%extends './menu-admin.html'%}
+{%block title%}Administrar Reportes{%endblock%}
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-reportes.css') }}">
+<div class="campo">
+    <div class="info-total">
+      <p>Número total de estudiantes actuales inscritos en la competencia:</p>
+      <p class="cantidad">50</p>
+    </div>
+  
+    <div class="selector">
+      <label>NIVEL:</label>
+      <select class="curso">
+        <option value="1">3ro Primaria</option>
+        <option value="2">4to Primaria</option>
+        <option value="3">5to Primaria</option>
+        <option value="4">6to Primaria</option>
+        <option value="5">1ro Secundaria</option>
+        <option value="6">2do Secundaria</option>
+        <option value="7">3ro Secundaria</option>
+        <option value="8">4to Secundaria</option>
+        <option value="9">5to Secundaria</option>
+        <option value="10">6to Secundaria</option>
+      </select>
+    </div>
+  
+    <button class="Generar">Generar Reporte</button>
+  </div>  
+{%endblock content%}

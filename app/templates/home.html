@@ -1,10 +1,22 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Inicio</title>
-</head>
-<body>
-  <h1>Oh Sansi!</h1>
-</body>
-</html>
+{%extends './menu-home.html'%}
+{%block title%}Inicio{%endblock title%}
+{%block content%}
+<main>
+  <div class="bienvenida">
+      <div class="info">
+          <h2>Olimpiadas en Ciencias y Tecnología San Simón</h2>
+          <h3>La facultad de Ciencias y Tecnología de la Universidad Mayor de San Simón convoca a los estudiantes
+              del Sistema de Educación Regular a participar en las olimpiadas Oh! Sansi
+          </h3>
+          <p>
+              Matemáticas, Física, Química, Biología, Astronomía y Astrofísica, Informática, Robótica
+          </p>
+          <input type="button" id="insc" value="Inscribirse" onclick="location.href='{{ url_for('inscribirse') }}'">
+      </div>
+      <div class="mascota">
+          <img src="{{url_for('static', filename='images/robot-sansi.png')}}" alt="Hola Sansi">
+      </div>
+  </div>
+</main>
+{%endblock%}
+

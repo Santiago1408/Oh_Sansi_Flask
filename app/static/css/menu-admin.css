@@ -1,0 +1,67 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    min-height: 70px;
+    background-color: #dbe9f8;
+    align-items: center;
+    padding: 0 10px;
+    font-family: sans-serif
+}
+
+.oh-sansi{
+    font-size: 32px;
+    font-weight: 300;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif   ;
+}
+
+.logo img{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+nav a{
+    font-weight: 400;
+    padding: 0 40px;
+    font-size: 18px;
+}
+
+nav a:hover{
+    color: #00bbff;
+    transition: 0.3s;
+}
+
+nav a.active{
+    color: #212756;
+    font-weight: 600;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+i{
+    font-size: 30px;
+    margin-right: 40px;
+}
+
+#admin{
+    padding: 0 10px;
+}
+
+#admin:hover{
+    color:#000;
+    cursor: default;
+}
+

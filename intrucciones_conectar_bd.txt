@@ -1,0 +1,12 @@
+INSTRUCCIONES PARA CONECTARSE A LA BASE DE DATOS
+
+1. Crear una base de datos llamada "olimpiada"
+2. Ejecutar el script del archivo OH_SANSI_DB.txt en el gestor de base de datos
+3. Verificar los credenciales para la conexion en el archivo __init__.py
+    (Verificar el host y la contrasena)
+
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'olimpiada'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'

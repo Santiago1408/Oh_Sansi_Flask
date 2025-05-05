@@ -1,0 +1,80 @@
+{%extends './menu-admin.html'%}
+{%block title%}Administrar Areas{%endblock%}
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-areas.css') }}">
+<div class="contenedor">
+    <div class="lista">
+      <div class="fila">
+        <div class="info">
+          <span class="curso">Curso(Grado)</span>
+          <span class="area">- Área</span>
+          <span class="categoria">- Categoría</span>
+        </div>
+        <button class="eliminar">Eliminar</button>
+      </div>
+      <div class="fila">
+        <div class="info">
+          <span class="curso">Curso(Grado)</span>
+          <span class="area">- Área</span>
+          <span class="categoria">- Categoría</span>
+        </div>
+        <button class="eliminar">Eliminar</button>
+      </div>
+    </div>
+  
+    <div class="formulario">
+      <label>Crear Competencia:</label>
+      <select>
+        <option value="1">3ro Primaria</option>
+        <option value="2">4to Primaria</option>
+        <option value="3">5to Primaria</option>
+        <option value="4">6to Primaria</option>
+        <option value="5">1ro Secundaria</option>
+        <option value="6">2do Secundaria</option>
+        <option value="7">3ro Secundaria</option>
+        <option value="8">4to Secundaria</option>
+        <option value="9">5to Secundaria</option>
+        <option value="10">6to Secundaria</option>
+      </select>
+      <select>
+        <option value="1">Astronomía-Astrofísica</option>
+        <option value="2">Biología</option>
+        <option value="3">Física</option>
+        <option value="4">Informática</option>
+        <option value="5">Matemáticas</option>
+        <option value="6">Química</option>
+        <option value="7">Robótica</option>
+      </select>
+      <select>
+        <option value="1">3P</option>
+        <option value="2">4P</option>
+        <option value="3">5P</option>
+        <option value="4">6P</option>
+        <option value="5">1S</option>
+        <option value="6">2S</option>
+        <option value="7">3S</option>
+        <option value="8">4S</option>
+        <option value="9">5S</option>
+        <option value="10">6S</option>
+        <option value="11">Guacamayo</option>
+        <option value="12">Guanaco</option>
+        <option value="13">Londra</option>
+        <option value="14">Jucumari</option>
+        <option value="15">Bufeo</option>
+        <option value="16">Puma</option>
+        <option value="17">Primer Nivel</option>
+        <option value="18">Segundo Nivel</option>
+        <option value="19">Tercer Nivel</option>
+        <option value="20">Cuarto Nivel</option>
+        <option value="21">Quinto Nivel</option>
+        <option value="22">Sexto Nivel</option>
+        <option value="23">Builders P</option>
+        <option value="24">Builders S</option>
+        <option value="25">Lego P</option>
+        <option value="26">Lego S</option>
+      </select>
+      <button class="crear">Crear</button>
+      
+    </div>
+  </div>  
+{%endblock content%}
