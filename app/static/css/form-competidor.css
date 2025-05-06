@@ -63,7 +63,7 @@ select{
     margin: 30px 17% 40px 40px;
 }
 
-input[type="submit"], input[type="reset"]{
+.boton{
     background-color: #212756;
     color: white;
     padding: 15px 30px;
@@ -74,7 +74,7 @@ input[type="submit"], input[type="reset"]{
     margin-left: 20px;
 }
 
-input[type="submit"]:hover, input[type="reset"]:hover{
+.boton:hover{   
     background-color: #00bbff;
     transition: 0.3s;
 }
