@@ -23,19 +23,6 @@
   <form class="formulario" action="{{ url_for('registrar_area') }}" method="POST">
     <label>Crear Competencia:</label>
 
-    <select name="curso" id="curso">
-      <option value="3ro de Primaria">3ro Primaria</option>
-      <option value="4to de Primaria">4to Primaria</option>
-      <option value="5to de Primaria">5to Primaria</option>
-      <option value="6to de Primaria">6to Primaria</option>
-      <option value="1ro Secundaria">1ro Secundaria</option>
-      <option value="2do Secundaria">2do Secundaria</option>
-      <option value="3ro Secundaria">3ro Secundaria</option>
-      <option value="4to Secundaria">4to Secundaria</option>
-      <option value="5to Secundaria">5to Secundaria</option>
-      <option value="6to Secundaria">6to Secundaria</option>
-    </select>
-
     <select name="area" id="area">
       <option value="Astronomia-Astrofisica">Astronomía-Astrofísica</option>
       <option value="Biologia">Biología</option>
@@ -46,37 +33,328 @@
       <option value="Robotica">Robótica</option>
     </select>
 
+    <select name="curso" id="curso">
+      <!-- Opciones se cargarán dinámicamente con JavaScript -->
+    </select>
+
     <select name="categoria" id="categoria">
-      <option value="3P">3P</option>
-      <option value="4P">4P</option>
-      <option value="5P">5P</option>
-      <option value="6P">6P</option>
-      <option value="1S">1S</option>
-      <option value="2S">2S</option>
-      <option value="3S">3S</option>
-      <option value="4S">4S</option>
-      <option value="5S">5S</option>
-      <option value="6S">6S</option>
-      <option value="Guacamayo">Guacamayo</option>
-      <option value="Guanaco">Guanaco</option>
-      <option value="Londra">Londra</option>
-      <option value="Jucumari">Jucumari</option>
-      <option value="Bufeo">Bufeo</option>
-      <option value="Puma">Puma</option>
-      <option value="Primer Nivel">Primer Nivel</option>
-      <option value="Segundo Nivel">Segundo Nivel</option>
-      <option value="Tercer Nivel">Tercer Nivel</option>
-      <option value="Cuarto Nivel">Cuarto Nivel</option>
-      <option value="Quinto Nivel">Quinto Nivel</option>
-      <option value="Sexto Nivel">Sexto Nivel</option>
-      <option value="Builders P">Builders P</option>
-      <option value="Builders S">Builders S</option>
-      <option value="Lego P">Lego P</option>
-      <option value="Lego S">Lego S</option>
+      <!-- Opciones se cargarán dinámicamente con JavaScript -->
     </select>
 
     <input type="submit" value="Crear" class="crear">
-
   </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Define las relaciones entre área, curso y categoría según la tabla proporcionada
+      const relationData = [
+        // Astronomía-Astrofísica
+        { area: "Astronomia-Astrofisica", curso: "3ro Primaria", categoria: "3P" },
+        { area: "Astronomia-Astrofisica", curso: "4to Primaria", categoria: "4P" },
+        { area: "Astronomia-Astrofisica", curso: "5to Primaria", categoria: "5P" },
+        { area: "Astronomia-Astrofisica", curso: "6to Primaria", categoria: "6P" },
+        { area: "Astronomia-Astrofisica", curso: "1ro Secundaria", categoria: "1S" },
+        { area: "Astronomia-Astrofisica", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Astronomia-Astrofisica", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Astronomia-Astrofisica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Astronomia-Astrofisica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Astronomia-Astrofisica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Biología
+        { area: "Biologia", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Biologia", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Biologia", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Biologia", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Biologia", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Física
+        { area: "Fisica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Fisica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Fisica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Informática
+        { area: "Informatica", curso: "5to Primaria", categoria: "Guacamayo" },
+        { area: "Informatica", curso: "6to Primaria", categoria: "Guacamayo" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "4to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "5to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "6to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "4to Secundaria", categoria: "Puma" },
+        { area: "Informatica", curso: "5to Secundaria", categoria: "Puma" },
+        { area: "Informatica", curso: "6to Secundaria", categoria: "Puma" },
+        
+        // Matemáticas
+        { area: "Matematicas", curso: "1ro Secundaria", categoria: "Primer Nivel" },
+        { area: "Matematicas", curso: "2do Secundaria", categoria: "Segundo Nivel" },
+        { area: "Matematicas", curso: "3ro Secundaria", categoria: "Tercer Nivel" },
+        { area: "Matematicas", curso: "4to Secundaria", categoria: "Cuarto Nivel" },
+        { area: "Matematicas", curso: "5to Secundaria", categoria: "Quinto Nivel" },
+        { area: "Matematicas", curso: "6to Secundaria", categoria: "Sexto Nivel" },
+        
+        // Química
+        { area: "Quimica", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Quimica", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Quimica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Quimica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Quimica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Robótica
+        { area: "Robotica", curso: "5to Primaria", categoria: "Builders P" },
+        { area: "Robotica", curso: "6to Primaria", categoria: "Builders P" },
+        { area: "Robotica", curso: "1ro Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "2do Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "3ro Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "4to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "5to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "6to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "5to Primaria", categoria: "Lego P" },
+        { area: "Robotica", curso: "6to Primaria", categoria: "Lego P" },
+        { area: "Robotica", curso: "1ro Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "2do Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "3ro Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "4to Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "5to Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "6to Secundaria", categoria: "Lego S" }
+      ];
+
+      // Obtener los elementos del formulario
+      const areaSelect = document.getElementById('area');
+      const cursoSelect = document.getElementById('curso');
+      const categoriaSelect = document.getElementById('categoria');
+
+      // Función para filtrar y actualizar las opciones del curso basado en el área seleccionada
+      function updateCursoOptions() {
+        const selectedArea = areaSelect.value;
+        
+        // Filtrar cursos disponibles para el área seleccionada
+        const availableCursos = [...new Set(relationData
+          .filter(item => item.area === selectedArea)
+          .map(item => item.curso))];
+        
+        // Guardar el curso seleccionado actualmente si existe
+        const currentCurso = cursoSelect.value;
+        
+        // Limpiar el select de cursos
+        cursoSelect.innerHTML = '';
+        
+        // Agregar las opciones filtradas
+        availableCursos.forEach(curso => {
+          const option = document.createElement('option');
+          option.value = curso;
+          option.textContent = curso;
+          cursoSelect.appendChild(option);
+        });
+        
+        // Intentar restaurar la selección previa si está disponible
+        if (availableCursos.includes(currentCurso)) {
+          cursoSelect.value = currentCurso;
+        }
+        
+        // Actualizar las categorías después de actualizar los cursos
+        updateCategoriaOptions();
+      }
+
+      // Función para filtrar y actualizar las opciones de categoría basado en el área y curso seleccionados
+      function updateCategoriaOptions() {
+        const selectedArea = areaSelect.value;
+        const selectedCurso = cursoSelect.value;
+        
+        // Filtrar categorías disponibles para el área y curso seleccionados
+        const availableCategorias = [...new Set(relationData
+          .filter(item => item.area === selectedArea && item.curso === selectedCurso)
+          .map(item => item.categoria))];
+        
+        // Guardar la categoría seleccionada actualmente si existe
+        const currentCategoria = categoriaSelect.value;
+        
+        // Limpiar el select de categorías
+        categoriaSelect.innerHTML = '';
+        
+        // Agregar las opciones filtradas
+        availableCategorias.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria;
+          option.textContent = categoria;
+          categoriaSelect.appendChild(option);
+        });
+        
+        // Intentar restaurar la selección previa si está disponible
+        if (availableCategorias.includes(currentCategoria)) {
+          categoriaSelect.value = currentCategoria;
+        }
+      }
+
+      // Inicializar los selects al cargar la página
+      updateCursoOptions();
+      
+      // Agregar event listeners para actualizar las opciones cuando cambie la selección
+      areaSelect.addEventListener('change', updateCursoOptions);
+      cursoSelect.addEventListener('change', updateCategoriaOptions);
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Define las relaciones entre área, curso y categoría según la tabla proporcionada
+      const relationData = [
+        // Astronomía-Astrofísica
+        { area: "Astronomia-Astrofisica", curso: "3ro Primaria", categoria: "3P" },
+        { area: "Astronomia-Astrofisica", curso: "4to Primaria", categoria: "4P" },
+        { area: "Astronomia-Astrofisica", curso: "5to Primaria", categoria: "5P" },
+        { area: "Astronomia-Astrofisica", curso: "6to Primaria", categoria: "6P" },
+        { area: "Astronomia-Astrofisica", curso: "1ro Secundaria", categoria: "1S" },
+        { area: "Astronomia-Astrofisica", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Astronomia-Astrofisica", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Astronomia-Astrofisica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Astronomia-Astrofisica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Astronomia-Astrofisica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Biología
+        { area: "Biologia", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Biologia", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Biologia", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Biologia", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Biologia", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Física
+        { area: "Fisica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Fisica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Fisica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Informática
+        { area: "Informatica", curso: "5to Primaria", categoria: "Guacamayo" },
+        { area: "Informatica", curso: "6to Primaria", categoria: "Guacamayo" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Guanaco" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Londra" },
+        { area: "Informatica", curso: "4to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "5to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "6to Secundaria", categoria: "Jucumari" },
+        { area: "Informatica", curso: "1ro Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "2do Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "3ro Secundaria", categoria: "Bufeo" },
+        { area: "Informatica", curso: "4to Secundaria", categoria: "Puma" },
+        { area: "Informatica", curso: "5to Secundaria", categoria: "Puma" },
+        { area: "Informatica", curso: "6to Secundaria", categoria: "Puma" },
+        
+        // Matemáticas
+        { area: "Matematicas", curso: "1ro Secundaria", categoria: "Primer Nivel" },
+        { area: "Matematicas", curso: "2do Secundaria", categoria: "Segundo Nivel" },
+        { area: "Matematicas", curso: "3ro Secundaria", categoria: "Tercer Nivel" },
+        { area: "Matematicas", curso: "4to Secundaria", categoria: "Cuarto Nivel" },
+        { area: "Matematicas", curso: "5to Secundaria", categoria: "Quinto Nivel" },
+        { area: "Matematicas", curso: "6to Secundaria", categoria: "Sexto Nivel" },
+        
+        // Química
+        { area: "Quimica", curso: "2do Secundaria", categoria: "2S" },
+        { area: "Quimica", curso: "3ro Secundaria", categoria: "3S" },
+        { area: "Quimica", curso: "4to Secundaria", categoria: "4S" },
+        { area: "Quimica", curso: "5to Secundaria", categoria: "5S" },
+        { area: "Quimica", curso: "6to Secundaria", categoria: "6S" },
+        
+        // Robótica
+        { area: "Robotica", curso: "5to Primaria", categoria: "Builders P" },
+        { area: "Robotica", curso: "6to Primaria", categoria: "Builders P" },
+        { area: "Robotica", curso: "1ro Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "2do Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "3ro Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "4to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "5to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "6to Secundaria", categoria: "Builders S" },
+        { area: "Robotica", curso: "5to Primaria", categoria: "Lego P" },
+        { area: "Robotica", curso: "6to Primaria", categoria: "Lego P" },
+        { area: "Robotica", curso: "1ro Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "2do Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "3ro Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "4to Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "5to Secundaria", categoria: "Lego S" },
+        { area: "Robotica", curso: "6to Secundaria", categoria: "Lego S" }
+      ];
+    
+      // Obtener los elementos del formulario
+      const areaSelect = document.getElementById('area');
+      const cursoSelect = document.getElementById('curso');
+      const categoriaSelect = document.getElementById('categoria');
+    
+      // Función para filtrar y actualizar las opciones del curso basado en el área seleccionada
+      function updateCursoOptions() {
+        const selectedArea = areaSelect.value;
+        
+        // Filtrar cursos disponibles para el área seleccionada
+        const availableCursos = [...new Set(relationData
+          .filter(item => item.area === selectedArea)
+          .map(item => item.curso))];
+        
+        // Guardar el curso seleccionado actualmente si existe
+        const currentCurso = cursoSelect.value;
+        
+        // Limpiar el select de cursos
+        cursoSelect.innerHTML = '';
+        
+        // Agregar las opciones filtradas
+        availableCursos.forEach(curso => {
+          const option = document.createElement('option');
+          option.value = curso;
+          option.textContent = curso;
+          cursoSelect.appendChild(option);
+        });
+        
+        // Intentar restaurar la selección previa si está disponible
+        if (availableCursos.includes(currentCurso)) {
+          cursoSelect.value = currentCurso;
+        }
+        
+        // Actualizar las categorías después de actualizar los cursos
+        updateCategoriaOptions();
+      }
+    
+      // Función para filtrar y actualizar las opciones de categoría basado en el área y curso seleccionados
+      function updateCategoriaOptions() {
+        const selectedArea = areaSelect.value;
+        const selectedCurso = cursoSelect.value;
+        
+        // Filtrar categorías disponibles para el área y curso seleccionados
+        const availableCategorias = [...new Set(relationData
+          .filter(item => item.area === selectedArea && item.curso === selectedCurso)
+          .map(item => item.categoria))];
+        
+        // Guardar la categoría seleccionada actualmente si existe
+        const currentCategoria = categoriaSelect.value;
+        
+        // Limpiar el select de categorías
+        categoriaSelect.innerHTML = '';
+        
+        // Agregar las opciones filtradas
+        availableCategorias.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria;
+          option.textContent = categoria;
+          categoriaSelect.appendChild(option);
+        });
+        
+        // Intentar restaurar la selección previa si está disponible
+        if (availableCategorias.includes(currentCategoria)) {
+          categoriaSelect.value = currentCategoria;
+        }
+      }
+    
+      // Inicializar los selects al cargar la página
+      updateCursoOptions();
+      
+      // Agregar event listeners para actualizar las opciones cuando cambie la selección
+      areaSelect.addEventListener('change', updateCursoOptions);
+      cursoSelect.addEventListener('change', updateCategoriaOptions);
+    });
+  </script>
 </div>
 {%endblock content%}
