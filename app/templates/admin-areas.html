@@ -3,78 +3,76 @@
 {%block content%}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-areas.css') }}">
 <div class="contenedor">
-    <div class="lista">
-      <div class="fila">
-        <div class="info">
-          <span class="curso">Curso(Grado)</span>
-          <span class="area">- Área</span>
-          <span class="categoria">- Categoría</span>
-        </div>
-        <button class="eliminar">Eliminar</button>
+  <div class="lista">
+    <h2>Competencias creadas: </h2>
+    {% for competencia in data %}
+    <div class="fila">
+      <div class="info">
+        <span class="curso">{{ competencia.grado }}</span>
+        <span class="area">- {{ competencia.area }}</span>
+        <span class="categoria">- {{ competencia.categoria }}</span>
       </div>
-      <div class="fila">
-        <div class="info">
-          <span class="curso">Curso(Grado)</span>
-          <span class="area">- Área</span>
-          <span class="categoria">- Categoría</span>
-        </div>
-        <button class="eliminar">Eliminar</button>
-      </div>
+      <form action="{{ url_for('eliminar_competencia') }}" method="POST">
+        <input type="hidden" name="id" value="{{ competencia.id_competencia }}">
+        <button type="submit" class="eliminar">Eliminar</button>
+      </form>
     </div>
-  
-    <div class="formulario">
-      <label>Crear Competencia:</label>
-      <select>
-        <option value="1">3ro Primaria</option>
-        <option value="2">4to Primaria</option>
-        <option value="3">5to Primaria</option>
-        <option value="4">6to Primaria</option>
-        <option value="5">1ro Secundaria</option>
-        <option value="6">2do Secundaria</option>
-        <option value="7">3ro Secundaria</option>
-        <option value="8">4to Secundaria</option>
-        <option value="9">5to Secundaria</option>
-        <option value="10">6to Secundaria</option>
-      </select>
-      <select>
-        <option value="1">Astronomía-Astrofísica</option>
-        <option value="2">Biología</option>
-        <option value="3">Física</option>
-        <option value="4">Informática</option>
-        <option value="5">Matemáticas</option>
-        <option value="6">Química</option>
-        <option value="7">Robótica</option>
-      </select>
-      <select>
-        <option value="1">3P</option>
-        <option value="2">4P</option>
-        <option value="3">5P</option>
-        <option value="4">6P</option>
-        <option value="5">1S</option>
-        <option value="6">2S</option>
-        <option value="7">3S</option>
-        <option value="8">4S</option>
-        <option value="9">5S</option>
-        <option value="10">6S</option>
-        <option value="11">Guacamayo</option>
-        <option value="12">Guanaco</option>
-        <option value="13">Londra</option>
-        <option value="14">Jucumari</option>
-        <option value="15">Bufeo</option>
-        <option value="16">Puma</option>
-        <option value="17">Primer Nivel</option>
-        <option value="18">Segundo Nivel</option>
-        <option value="19">Tercer Nivel</option>
-        <option value="20">Cuarto Nivel</option>
-        <option value="21">Quinto Nivel</option>
-        <option value="22">Sexto Nivel</option>
-        <option value="23">Builders P</option>
-        <option value="24">Builders S</option>
-        <option value="25">Lego P</option>
-        <option value="26">Lego S</option>
-      </select>
-      <button class="crear">Crear</button>
-      
-    </div>
-  </div>  
+    {% endfor %}
+  </div>
+
+  <form class="formulario" action="{{ url_for('registrar_area') }}" method="POST">
+    <label>Crear Competencia:</label>
+    <select name="curso" id="curso">
+      <option value="3ro de Primaria">3ro Primaria</option>
+      <option value="4to de Primaria">4to Primaria</option>
+      <option value="5to de Primaria">5to Primaria</option>
+      <option value="6to de Primaria">6to Primaria</option>
+      <option value="1ro Secundaria">1ro Secundaria</option>
+      <option value="2do Secundaria">2do Secundaria</option>
+      <option value="3ro Secundaria">3ro Secundaria</option>
+      <option value="4to Secundaria">4to Secundaria</option>
+      <option value="5to Secundaria">5to Secundaria</option>
+      <option value="6to Secundaria">6to Secundaria</option>
+    </select>
+    <select name="area" id="area">
+      <option value="Astronomia-Astrofisica">Astronomía-Astrofísica</option>
+      <option value="Biologia">Biología</option>
+      <option value="Fisica">Física</option>
+      <option value="Informatica">Informática</option>
+      <option value="Matematicas">Matemáticas</option>
+      <option value="Quimica">Química</option>
+      <option value="Robotica">Robótica</option>
+    </select>
+    <select name="categoria" id="categoria">
+      <option value="3P">3P</option>
+      <option value="4P">4P</option>
+      <option value="5P">5P</option>
+      <option value="6P">6P</option>
+      <option value="1S">1S</option>
+      <option value="2S">2S</option>
+      <option value="3S">3S</option>
+      <option value="4S">4S</option>
+      <option value="5S">5S</option>
+      <option value="6S">6S</option>
+      <option value="Guacamayo">Guacamayo</option>
+      <option value="Guanaco">Guanaco</option>
+      <option value="Londra">Londra</option>
+      <option value="Jucumari">Jucumari</option>
+      <option value="Bufeo">Bufeo</option>
+      <option value="Puma">Puma</option>
+      <option value="Primer Nivel">Primer Nivel</option>
+      <option value="Segundo Nivel">Segundo Nivel</option>
+      <option value="Tercer Nivel">Tercer Nivel</option>
+      <option value="Cuarto Nivel">Cuarto Nivel</option>
+      <option value="Quinto Nivel">Quinto Nivel</option>
+      <option value="Sexto Nivel">Sexto Nivel</option>
+      <option value="Builders P">Builders P</option>
+      <option value="Builders S">Builders S</option>
+      <option value="Lego P">Lego P</option>
+      <option value="Lego S">Lego S</option>
+    </select>
+    <input type="submit" value="Crear" class="crear">
+
+  </form>
+</div>
 {%endblock content%}

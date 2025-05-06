@@ -62,12 +62,26 @@
             </select>
             <h2>TUTOR</h2>
             <p>Seleccionar tutor: </p>
-            <select name="tutor" id="">
-                <option value="1">Código1</option>
-                <option value="2">Código2</option>
+            <select name="tutor" id="tutor">
+                <option value="" selected disabled>Seleccione un tutor</option>
             </select> 
-            <div class="datos">
-                <label>Datos del tutor</label>
+            <div class="tutor-info" id="tutorInfo">
+                <div class="info-field">
+                    <label>Nombre:</label>
+                    <span id="nombreTutor"></span>
+                </div>
+                <div class="info-field">
+                    <label>Apellidos:</label>
+                    <span id="apellidoTutor"></span>
+                </div>
+                <div class="info-field">
+                    <label>Correo electrónico:</label>
+                    <span id="emailTutor"></span>
+                </div>
+                <div class="info-field">
+                    <label>Número de celular:</label>
+                    <span id="telefonoTutor"></span>
+                </div>
             </div>
             <div class="botones">
                 <input type="reset" value="Cancelar" onclick="location.href='{{ url_for('home') }}'">
@@ -76,4 +90,82 @@
         </div>
     </div>
 </div>
+<script>
+    // Almacenar todos los tutores para acceder a sus datos
+    let todosTutores = [];
+
+    // Función para cargar los tutores desde la API
+    function cargarTutores() {
+        fetch('/obtener_tutores_completos')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener tutores');
+                }
+                return response.json();
+            })
+            .then(tutores => {
+                todosTutores = tutores;
+                const selectorTutores = document.getElementById('tutor');
+                
+                // Limpiar opciones existentes excepto la primera
+                while (selectorTutores.options.length > 1) {
+                    selectorTutores.remove(1);
+                }
+                
+                // Agregar cada tutor como una opción
+                tutores.forEach(tutor => {
+                    const option = document.createElement('option');
+                    option.value = tutor.id_usuario;
+                    option.textContent = `${tutor.nombre} ${tutor.apellido}`;
+                    selectorTutores.appendChild(option);
+                });
+
+                // Limpiar campos de información
+                limpiarInfoTutor();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('No se pudieron cargar los tutores. Por favor, intente de nuevo más tarde.');
+            });
+    }
+
+    // Función para mostrar la información del tutor seleccionado
+    function mostrarInfoTutor(idTutor) {
+        // Buscar el tutor seleccionado en la lista de tutores
+        const tutorSeleccionado = todosTutores.find(tutor => tutor.id_usuario == idTutor);
+        
+        if (tutorSeleccionado) {
+            // Mostrar los datos en los campos correspondientes
+            document.getElementById('nombreTutor').textContent = tutorSeleccionado.nombre;
+            document.getElementById('apellidoTutor').textContent = tutorSeleccionado.apellido;
+            document.getElementById('emailTutor').textContent = tutorSeleccionado.email;
+            document.getElementById('telefonoTutor').textContent = tutorSeleccionado.telefono;
+        } else {
+            limpiarInfoTutor();
+        }
+    }
+
+    // Función para limpiar los campos de información
+    function limpiarInfoTutor() {
+        document.getElementById('nombreTutor').textContent = '';
+        document.getElementById('apellidoTutor').textContent = '';
+        document.getElementById('emailTutor').textContent = '';
+        document.getElementById('telefonoTutor').textContent = '';
+    }
+
+    // Cargar tutores cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarTutores();
+        
+        // Agregar el evento change al selector de tutores
+        document.getElementById('tutor').addEventListener('change', function(event) {
+            const idTutorSeleccionado = event.target.value;
+            if (idTutorSeleccionado) {
+                mostrarInfoTutor(idTutorSeleccionado);
+            } else {
+                limpiarInfoTutor();
+            }
+        });
+    });
+</script>
 {%endblock%}

@@ -1,3 +1,4 @@
+import traceback
 from app import app, mysql
 from flask import render_template, jsonify, request, redirect, url_for, session, flash
 from functools import wraps
@@ -61,7 +62,12 @@ def home():
 @app.route('/admin-areas')
 @admin_required
 def adminareas():
-    return render_template('admin-areas.html')
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * FROM competencia"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('admin-areas.html', data=data)
 
 @app.route('/cajero')
 @cajero_required
@@ -264,3 +270,66 @@ def registrar_competidor():
         return redirect(url_for('login'))
         
     return redirect(url_for('inscribirse'))
+
+@app.route('/obtener_tutores')
+def obtener_tutores():
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT id_usuario, nombre, apellido FROM Usuario WHERE rol = 'tutor'")
+        tutores = cursor.fetchall()
+        cursor.close()
+        
+        return jsonify(tutores)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/obtener_tutores_completos')
+def obtener_tutores_completos():
+    try:
+        # Crear un cursor para ejecutar consultas SQL
+        cursor = mysql.connection.cursor()
+        
+        # Consulta SQL para obtener todos los datos de los tutores
+        cursor.execute("SELECT id_usuario, nombre, apellido, email, telefono FROM Usuario WHERE rol = 'tutor'")
+        
+        # Obtener los resultados
+        tutores = cursor.fetchall()
+        
+        # Cerrar el cursor
+        cursor.close()
+        
+        return jsonify(tutores)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/registrar-area', methods=['POST'])
+@admin_required
+def registrar_area():
+    data = {}
+    data['curso'] = request.form['curso']
+    data['area'] = request.form['area']
+    data['categoria'] = request.form['categoria']
+
+    cursor = mysql.connection.cursor()
+    sql = "INSERT INTO competencia (area, categoria, grado) VALUES (%s, %s, %s)" 
+    cursor.execute(sql, (data['area'], data['categoria'], data['curso']))
+    mysql.connection.commit()
+    cursor.close()
+    flash('Área registrada correctamente', 'success')
+    return redirect(url_for('adminareas'))
+
+@app.route('/eliminar-comptencia', methods=['POST'])
+@admin_required
+def eliminar_competencia():
+    data = {}
+    data['id'] = request.form['id']
+    
+    cursor = mysql.connection.cursor()
+    sql = "DELETE FROM competencia WHERE id_competencia = %s" 
+    cursor.execute(sql, (data['id'],))
+    mysql.connection.commit()
+    cursor.close()
+    flash('Competencia eliminada correctamente', 'success')
+    return redirect(url_for('adminareas'))

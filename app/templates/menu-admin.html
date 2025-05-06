@@ -14,9 +14,9 @@
             <h1 class="oh-sansi"><a href="{{url_for('home')}}">Oh! Sansi</a></h1>
         </div>
         <nav>
-            <a href="{{url_for('adminareas')}}" class="{% if request.path == url_for('adminareas') %}active{% endif %}">Áreas</a>
+            <a href="{{url_for('adminareas')}}" class="{% if request.path == url_for('adminareas') %}active{% endif %}">Competencias</a>
             <a href="{{url_for('adminreportes')}}" class="{% if request.path == url_for('adminreportes') %}active{% endif %}">Reportes</a>
-            <a href="{{url_for('admincompetencia')}}" class="{% if request.path == url_for('admincompetencia') %}active{% endif %}">Competencia</a>
+            <a href="{{url_for('admincompetencia')}}" class="{% if request.path == url_for('admincompetencia') %}active{% endif %}">Olimpiada</a>
             <a href="" id="admin">Admin</a>
             <i class="fa-solid fa-circle-user"></i>
         </nav>
