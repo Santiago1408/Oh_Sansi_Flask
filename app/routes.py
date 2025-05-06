@@ -180,52 +180,72 @@ def logout():
 @app.route('/registrarse', methods=['GET', 'POST'])
 def registrarse():
     if request.method == 'POST':
-        # Obtener los datos del formulario
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-        email = request.form['email']
-        telefono = request.form['telefono']
-        contrasenia = request.form['contrasenia']
-        rol = request.form['rol']
-        
-        # Validar datos
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            flash('Formato de correo electrónico inválido', 'error')
-            return render_template('registro.html')
-        
-        # Verificar si el correo ya está registrado
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM usuario WHERE email = %s", [email])
-        user_exists = cursor.fetchone()
-        
-        if user_exists:
-            flash('Este correo ya está registrado', 'error')
-            return render_template('registro.html')
-        
-        # Insertar nuevo usuario
-        cursor.execute(
-            "INSERT INTO usuario (nombre, apellido, email, telefono, contrasenia, rol) VALUES (%s, %s, %s, %s, %s, %s)",
-            (nombre, apellido, email, telefono, contrasenia, rol)
-        )
-        
-        # Obtener el ID del usuario recién insertado
-        user_id = cursor.lastrowid
-        
-        # Según el rol, insertar en la tabla correspondiente
-        if rol == 'administrador':
-            cursor.execute("INSERT INTO administrador (id_usuario) VALUES (%s)", [user_id])
-        elif rol == 'cajero':
-            cursor.execute("INSERT INTO cajero (id_usuario) VALUES (%s)", [user_id])
-        elif rol == 'tutor':
-            tipo_tutor = request.form.get('tipo_tutor', 'general')  # Por defecto 'general' si no se especifica
-            cursor.execute("INSERT INTO tutor (id_usuario, tipo_tutor) VALUES (%s, %s)", (user_id, tipo_tutor))
-        
-        # Competidor se registra en un formulario separado, ya que requiere más datos
-        
-        mysql.connection.commit()
-        flash('Te has registrado correctamente. Ahora puedes iniciar sesión.', 'success')
-        return redirect(url_for('login'))
-        
+        try:
+            nombres = request.form.get('nombres').strip()
+            apellidos = request.form.get('apellidos').strip()
+            fecha_nacimiento = request.form.get('fechaNacimiento')
+            ci = request.form.get('ci').strip()
+            email = request.form.get('email').strip()
+            telefono = request.form.get('numCelular').strip()
+            rol = request.form.get('rol').strip()
+            contrasena = request.form.get('password').strip()
+
+
+            cursor = mysql.connection.cursor()
+
+            cursor.execute("SELECT MAX(id_usuario) FROM usuario")
+            max_id_usuario = cursor.fetchone()['MAX(id_usuario)'] or 0
+            new_id_usuario = max_id_usuario + 1
+
+            query_usuario = """
+                INSERT INTO usuario (id_usuario, nombre, apellido, email, telefono, contrasenia, rol)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query_usuario, (new_id_usuario, nombres,
+                           apellidos, email, telefono, contrasena, rol))
+            mysql.connection.commit()
+
+            if rol == 'Cajero':
+                cursor.execute("SELECT MAX(id_cajero) FROM cajero")
+                max_id_cajero = cursor.fetchone()['MAX(id_cajero)'] or 0
+                new_id_cajero = max_id_cajero + 1
+
+                query_cajero = "INSERT INTO cajero (id_cajero, id_usuario) VALUES (%s, %s)"
+                cursor.execute(query_cajero, (new_id_cajero, new_id_usuario))
+
+            elif rol == 'Tutor':
+                cursor.execute("SELECT MAX(id_tutor) FROM tutor")
+                max_id_tutor = cursor.fetchone()['MAX(id_tutor)'] or 0
+                new_id_tutor = max_id_tutor + 1
+
+                tipo_tutor = "Profesor"  
+                query_tutor = "INSERT INTO tutor (id_tutor, id_usuario, tipo_tutor) VALUES (%s, %s, %s)"
+                cursor.execute(query_tutor, (new_id_tutor,
+                               new_id_usuario, tipo_tutor))
+
+            elif rol == 'Administrador':
+                cursor.execute(
+                    "SELECT MAX(id_administrador) FROM administrador")
+                max_id_administrador = cursor.fetchone()[
+                    'MAX(id_administrador)'] or 0
+                new_id_administrador = max_id_administrador + 1
+
+                query_administrador = "INSERT INTO administrador (id_administrador, id_usuario) VALUES (%s, %s)"
+                cursor.execute(query_administrador,
+                               (new_id_administrador, new_id_usuario))
+
+            mysql.connection.commit()
+            cursor.close()
+
+            flash('Usuario registrado correctamente.', 'success')
+            return redirect(url_for('registrarse'))
+
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(
+                f'Ocurrió un error al registrar el usuario: {str(e)}', 'danger')
+            return redirect(url_for('registrarse'))
+
     return render_template('registro.html')
 
 @app.route('/registrar-competidor', methods=['POST'])

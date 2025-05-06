@@ -1,107 +1,181 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERFISICO - Registro de Usuario</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h3>Registro de Usuario - ERFISICO</h3>
-                    </div>
-                    <div class="card-body">
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                          {% if messages %}
-                            {% for category, message in messages %}
-                              <div class="alert alert-{{ category if category != 'error' else 'danger' }}">
-                                {{ message }}
-                              </div>
-                            {% endfor %}
-                          {% endif %}
-                        {% endwith %}
-                        
-                        <form method="POST" action="{{ url_for('registrarse') }}">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="nombre" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="apellido" class="form-label">Apellido</label>
-                                    <input type="text" class="form-control" id="apellido" name="apellido" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="tel" class="form-control" id="telefono" name="telefono" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="contrasenia" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="contrasenia" name="contrasenia" required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="rol" class="form-label">Tipo de Usuario</label>
-                                <select class="form-select" id="rol" name="rol" required onchange="showTutorOptions()">
-                                    <option value="" selected disabled>Selecciona un tipo de usuario</option>
-                                    <option value="administrador">Administrador</option>
-                                    <option value="cajero">Cajero</option>
-                                    <option value="tutor">Tutor</option>
-                                </select>
-                            </div>
-                            
-                            <div id="tutorOptions" class="mb-3" style="display: none;">
-                                <label for="tipo_tutor" class="form-label">Tipo de Tutor</label>
-                                <select class="form-select" id="tipo_tutor" name="tipo_tutor">
-                                    <option value="profesor">Profesor</option>
-                                    <option value="padre">Padre/Madre</option>
-                                    <option value="apoderado">Apoderado</option>
-                                </select>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Registrarse</button>
-                            </div>
-                        </form>
-                        
-                        <div class="mt-4 text-center">
-                            <p>¿Ya tienes una cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
-                            <p>¿Eres competidor? <a href="{{ url_for('inscribirse') }}">Inscríbete aquí</a></p>
-                        </div>
-                    </div>
+{% extends './menu-home.html' %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+
+
+
+<div class="formulario">
+    <h2 id="titFormulario">Registro</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flashed-messages">
+        <ul>
+            {% for category, message in messages %}
+            <li class="{{ category }}">
+                <div class="message-wrapper">
+                    <span class="close-btn" onclick="this.closest('.flashed-messages').style.display='none';">
+                        &times;
+                    </span>
+                    {{ message }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <form action="{{url_for('registrarse')}}" method="POST" id="formularioRegistro">
+        <div class="campos">
+            <!-- Sección 1 -->
+            <div class="seccion1">
+                <p>Nombres:</p>
+                <input type="text" name="nombres" id="nombres" maxlength="50" required>
+                <span id="nombres-error" class="error-message"></span>
+                <p>Apellidos:</p>
+                <input type="text" name="apellidos" id="apellidos" maxlength="50" required>
+                <span id="apellidos-error" class="error-message"></span>
+                <p>Fecha de Nacimiento:</p>
+                <input type="date" name="fechaNacimiento" id="fechaNacimiento" required>
+                <span id="fechaNacimiento-error" class="error-message"></span>
+                <p>Carnet de Identidad:</p>
+                <input type="text" name="ci" id="ci" maxlength="12" required>
+                <span id="ci-error" class="error-message"></span>
+                <p>Correo Electrónico:</p>
+                <input type="email" name="email" id="email" maxlength="100" required>
+                <span id="email-error" class="error-message"></span>
+                <p>Número de Celular:</p>
+                <input type="number" name="numCelular" id="numCelular" required>
+                <span id="numCelular-error" class="error-message"></span>
+            </div>
+            <!-- Sección 2 -->
+            <div class="seccion2">
+                <p>Rol:</p>
+                <p class="mensaje-rol">Por favor escoja el rol que desee para la cuenta</p>
+                <select name="rol" id="rol" required>
+                    <option value="" disabled selected>Seleccione un rol</option>
+                    <option value="tutor">Tutor</option>
+                    <option value="administrador">Administrador</option>
+                    <option value="cajero">Cajero</option>
+                </select>
+                <span id="rol-error" class="error-message"></span>
+                <p>Contraseña:</p>
+                <input type="password" name="password" id="password" required>
+                <span id="password-error" class="error-message"></span>
+                <p>Verificar Contraseña:</p>
+                <input type="password" name="confirm_password" id="confirm_password" required>
+                <span id="error-message" class="error-message"></span>
+                <div class="botones">
+                    <input type="reset" value="Cancelar">
+                    <input type="submit" value="Registrarse">
                 </div>
             </div>
         </div>
-    </div>
+    </form>
+</div>
+<script>
+    document.getElementById('formularioRegistro').addEventListener('submit', function (event) {
+        let valid = true;
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        function showTutorOptions() {
-            const rol = document.getElementById('rol').value;
-            const tutorOptions = document.getElementById('tutorOptions');
-            
-            if (rol === 'tutor') {
-                tutorOptions.style.display = 'block';
-            } else {
-                tutorOptions.style.display = 'none';
-            }
+        const nombres = document.getElementById('nombres').value.trim();
+        const apellidos = document.getElementById('apellidos').value.trim();
+        const nombreApellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+
+        if (!nombreApellidoRegex.test(nombres)) {
+            document.getElementById('nombres-error').textContent = 'Ingrese un nombre válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            document.getElementById('nombres-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('nombres-error').style.display = 'none';
         }
-    </script>
-</body>
-</html>
+
+        if (!nombreApellidoRegex.test(apellidos)) {
+            document.getElementById('apellidos-error').textContent = 'Ingrese un apellido válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            document.getElementById('apellidos-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('apellidos-error').style.display = 'none';
+        }
+
+        const fechaNacimiento = new Date(document.getElementById('fechaNacimiento').value);
+        const hoy = new Date();
+        const edadMinima = 18;
+        const edadMaxima = 100;
+        const edadActual = hoy.getFullYear() - fechaNacimiento.getFullYear();
+
+        if (fechaNacimiento > hoy || edadActual < edadMinima || edadActual > edadMaxima) {
+            document.getElementById('fechaNacimiento-error').textContent = 'Debe tener entre 18 y 100 años.';
+            document.getElementById('fechaNacimiento-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('fechaNacimiento-error').style.display = 'none';
+        }
+
+        const ci = document.getElementById('ci').value.trim();
+        const ciRegex = /^\d{5,11}(-[A-Za-z\d]{1,2})?$/;
+
+        if (!ciRegex.test(ci)) {
+            document.getElementById('ci-error').textContent = 'Ingrese un CI válido (ejemplo: 123456-1A o solo números).';
+            document.getElementById('ci-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('ci-error').style.display = 'none';
+        }
+
+        const email = document.getElementById('email').value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            document.getElementById('email-error').textContent = 'Ingrese un correo electrónico válido.';
+            document.getElementById('email-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('email-error').style.display = 'none';
+        }
+
+        const numCelular = document.getElementById('numCelular').value.trim();
+        const numCelularRegex = /^[67]\d{7}$/;
+
+        if (!numCelularRegex.test(numCelular)) {
+            document.getElementById('numCelular-error').textContent = 'Ingrese un número de celular válido (8 dígitos, comenzando con 6 o 7).';
+            document.getElementById('numCelular-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('numCelular-error').style.display = 'none';
+        }
+
+        const rol = document.getElementById('rol').value;
+        if (!['Tutor', 'Administrador', 'Cajero'].includes(rol)) {
+            document.getElementById('rol-error').textContent = 'Seleccione un rol válido.';
+            document.getElementById('rol-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('rol-error').style.display = 'none';
+        }
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>,.?~`|{}[\]\\-])[A-Za-z\d!@#$%^&*()_+=<>,.?~`|{}[\]\\-]{8,}$/;
+
+        if (!passwordRequirements.test(password)) {
+            document.getElementById('password-error').textContent = 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial permitido.';
+            document.getElementById('password-error').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        if (password !== confirmPassword) {
+            document.getElementById('error-message').textContent = 'Las contraseñas no coinciden.';
+            document.getElementById('error-message').style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
