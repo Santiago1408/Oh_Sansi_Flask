@@ -145,7 +145,7 @@
         }
 
         const rol = document.getElementById('rol').value;
-        if (!['Tutor', 'Administrador', 'Cajero'].includes(rol)) {
+        if (!['tutor', 'administrador', 'cajero'].includes(rol)) {
             document.getElementById('rol-error').textContent = 'Seleccione un rol válido.';
             document.getElementById('rol-error').style.display = 'block';
             valid = false;

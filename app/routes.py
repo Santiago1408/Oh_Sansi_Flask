@@ -205,7 +205,7 @@ def registrarse():
                            apellidos, email, telefono, contrasena, rol))
             mysql.connection.commit()
 
-            if rol == 'Cajero':
+            if rol == 'cajero':
                 cursor.execute("SELECT MAX(id_cajero) FROM cajero")
                 max_id_cajero = cursor.fetchone()['MAX(id_cajero)'] or 0
                 new_id_cajero = max_id_cajero + 1
@@ -213,17 +213,17 @@ def registrarse():
                 query_cajero = "INSERT INTO cajero (id_cajero, id_usuario) VALUES (%s, %s)"
                 cursor.execute(query_cajero, (new_id_cajero, new_id_usuario))
 
-            elif rol == 'Tutor':
+            elif rol == 'tutor':
                 cursor.execute("SELECT MAX(id_tutor) FROM tutor")
                 max_id_tutor = cursor.fetchone()['MAX(id_tutor)'] or 0
                 new_id_tutor = max_id_tutor + 1
 
-                tipo_tutor = "Profesor"  
+                tipo_tutor = "profesor"  
                 query_tutor = "INSERT INTO tutor (id_tutor, id_usuario, tipo_tutor) VALUES (%s, %s, %s)"
                 cursor.execute(query_tutor, (new_id_tutor,
                                new_id_usuario, tipo_tutor))
 
-            elif rol == 'Administrador':
+            elif rol == 'administrador':
                 cursor.execute(
                     "SELECT MAX(id_administrador) FROM administrador")
                 max_id_administrador = cursor.fetchone()[

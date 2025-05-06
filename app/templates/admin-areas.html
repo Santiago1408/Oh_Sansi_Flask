@@ -22,6 +22,7 @@
 
   <form class="formulario" action="{{ url_for('registrar_area') }}" method="POST">
     <label>Crear Competencia:</label>
+
     <select name="curso" id="curso">
       <option value="3ro de Primaria">3ro Primaria</option>
       <option value="4to de Primaria">4to Primaria</option>
@@ -34,6 +35,7 @@
       <option value="5to Secundaria">5to Secundaria</option>
       <option value="6to Secundaria">6to Secundaria</option>
     </select>
+
     <select name="area" id="area">
       <option value="Astronomia-Astrofisica">Astronomía-Astrofísica</option>
       <option value="Biologia">Biología</option>
@@ -43,6 +45,7 @@
       <option value="Quimica">Química</option>
       <option value="Robotica">Robótica</option>
     </select>
+
     <select name="categoria" id="categoria">
       <option value="3P">3P</option>
       <option value="4P">4P</option>
@@ -71,6 +74,7 @@
       <option value="Lego P">Lego P</option>
       <option value="Lego S">Lego S</option>
     </select>
+
     <input type="submit" value="Crear" class="crear">
 
   </form>
