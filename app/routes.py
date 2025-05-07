@@ -262,7 +262,8 @@ def registrar_competidor():
         curso = request.form['curso']
         departamento = request.form['departamento']
         provincia = request.form['provincia']
-        
+        estado = 'pendiente'
+
         # Validar datos
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('Formato de correo electrónico inválido', 'error')
@@ -280,9 +281,9 @@ def registrar_competidor():
         # Insertar nuevo competidor
         cursor.execute(
             """INSERT INTO competidor 
-            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia)
+            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia, estado) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia, estado)
         )
         
         mysql.connection.commit()

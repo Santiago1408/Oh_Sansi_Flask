@@ -8,43 +8,47 @@
     <form action="{{url_for('registrar_competidor')}}" class="campos" method="POST">
         <div class="seccion1">
             <p>Nombres: </p>
-            <input type="text" name="nombres" id="">
+            <input type="text" name="nombre" id="">
             <p>Apellidos: </p>
-            <input type="text" name="apellidos" id="">
+            <input type="text" name="apellido" id="">
             <p>Fecha de nacimeinto: </p>
-            <input type="date" name="fechaNacimiento" id="">
+            <input type="date" name="fecha_nacimiento" id="">
             <p>Carnet de identidad:</p>
             <input type="text" name="ci" id="">
             <p>Correo electrónico: </p>
             <input type="email" name="email" id="">
             <p>Número de celular: </p>
-            <input type="text" name="numCelular" id="">
+            <input type="text" name="telefono" id="">
             <p>Colegio: </p>
             <input type="text" name="colegio" id="">
             <p>Curso: </p>
             <select name="curso" id="">
-                <option value="1">1ro Secundaria</option>
-                <option value="2">2do Secundaria</option>
-                <option value="3">3ro Secundaria</option>
-                <option value="4">4to Secundaria</option>
-                <option value="5">5to Secundaria</option>
-                <option value="6">6to Secundaria</option>
+                <option value="3ro Primaria">3ro Primaria</option>
+                <option value="4to Primaria">4to Primaria</option>
+                <option value="5to Primaria">5to Primaria</option>
+                <option value="6to Primaria">6to Primaria</option>
+                <option value="1ro Secundaria">1ro Secundaria</option>
+                <option value="2do Secundaria">2do Secundaria</option>
+                <option value="3ro Secundaria">3ro Secundaria</option>
+                <option value="4to Secundaria">4to Secundaria</option>
+                <option value="5to Secundaria">5to Secundaria</option>
+                <option value="6to Secundaria">6to Secundaria</option>
             </select>
         </div>
         <div class="seccion2">
             <p>Provincia: </p>
             <input type="text" name="provincia" id="">
             <p>Departamento: </p>
-            <select name="curso" id="">
-                <option value="1">Cochabamba</option>
-                <option value="2">Santa Cruz</option>
-                <option value="3">La Paz</option>
-                <option value="4">Chuquisaca</option>
-                <option value="5">Tarija</option>
-                <option value="6">Oruro</option>
-                <option value="7">Potosi</option>
-                <option value="8">Beni</option>
-                <option value="9">Pando</option>
+            <select name="departamento" id="">
+                <option value="Cochabamba">Cochabamba</option>
+                <option value="Santa Cruz">Santa Cruz</option>
+                <option value="La Paz">La Paz</option>
+                <option value="Chuquisaca">Chuquisaca</option>
+                <option value="Tarija">Tarija</option>
+                <option value="Oruro">Oruro</option>
+                <option value="Potosi">Potosi</option>
+                <option value="Beni">Beni</option>
+                <option value="Pando">Pando</option>
             </select>
             <p>Área: </p>
             <select name="area" id="">
@@ -58,7 +62,7 @@
             </select>
             <p>Categoría: </p>
             <select name="categoría" id="">
-                <option value="1">opciones</option>
+                <option value="Jucumari">Jucumari</option>
             </select>
             <h2>TUTOR</h2>
             <p>Seleccionar tutor: </p>
