@@ -1,3 +1,4 @@
+from datetime import date
 import traceback
 from app import app, mysql
 from flask import render_template, jsonify, request, redirect, url_for, session, flash
@@ -152,7 +153,6 @@ def login():
             tutor = cursor.fetchone()
             if tutor:
                 session['tutor_id'] = tutor['id_tutor']
-                session['tipo_tutor'] = tutor['tipo_tutor']
             return redirect(url_for('tutor'))
             
         elif user['rol'] == 'competidor':
@@ -248,49 +248,120 @@ def registrarse():
 
     return render_template('registro.html')
 
-@app.route('/registrar-competidor', methods=['POST'])
+# Ruta para obtener las competencias disponibles
+@app.route('/obtener_competencias')
+def obtener_competencias():
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Consulta SQL para obtener las competencias
+        query = """
+        SELECT id_competencia, area, categoria, grado
+        FROM Competencia
+        """
+        
+        cursor.execute(query)
+        competencias = cursor.fetchall()
+        cursor.close()
+        
+        # Convertir los resultados a una lista de diccionarios - VERSIÓN CORREGIDA
+        resultado = []
+        for comp in competencias:
+            resultado.append({
+                'id_competencia': comp['id_competencia'],
+                'area': comp['area'],
+                'categoria': comp['categoria'],
+                'grado': comp['grado']
+            })
+        
+        return jsonify(resultado)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Ruta para registrar un nuevo competidor
+@app.route('/registrar_competidor', methods=['POST'])
 def registrar_competidor():
     if request.method == 'POST':
         # Obtener los datos del formulario
-        ci = request.form['ci']
         nombre = request.form['nombre']
         apellido = request.form['apellido']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        ci = request.form['ci']
         email = request.form['email']
         telefono = request.form['telefono']
-        fecha_nacimiento = request.form['fecha_nacimiento']
         colegio = request.form['colegio']
         curso = request.form['curso']
         departamento = request.form['departamento']
         provincia = request.form['provincia']
+        area = request.form['area']
+        categoria = request.form['categoria']
+        id_tutor = request.form['id_tutor']
         estado = 'pendiente'
-
-        # Validar datos
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            flash('Formato de correo electrónico inválido', 'error')
-            return redirect(url_for('inscribirse'))
         
-        # Verificar si el CI o correo ya están registrados
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM competidor WHERE ci = %s OR email = %s", (ci, email))
-        competidor_exists = cursor.fetchone()
+        try:
+            print("Datos recibidos:")
+            cursor = mysql.connection.cursor()
+            
+            # 1. Insertar el competidor en la tabla Competidor
+            insert_competidor = """
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
+            print("Competidor insertado correctamente")
+            
+            # Obtener el ID del competidor recién insertado
+            id_competidor = cursor.lastrowid
+            
+            # 2. Crear una inscripción asociando el competidor con el tutor
+            insert_inscripcion = """
+            INSERT INTO Inscripcion (id_competidor, id_tutor, fecha_inscripcion)
+            VALUES (%s, %s, %s)
+            """
+            fecha_actual = date.today()
+            cursor.execute(insert_inscripcion, (id_competidor, id_tutor, fecha_actual))
+            
+            # 3. Obtener el ID de la competencia según el área, categoría y curso seleccionados
+            query_competencia = """
+            SELECT id_competencia FROM Competencia
+            WHERE area = %s AND categoria = %s AND grado = %s
+            """
+            cursor.execute(query_competencia, (area, categoria, curso))
+            competencia = cursor.fetchone()
+            
+            if competencia:
+                id_competencia = competencia[0]
+                
+                # 4. Registrar la participación del competidor en la competencia
+                insert_compite = """
+                INSERT INTO compite (id_competencia, id_competidor)
+                VALUES (%s, %s)
+                """
+                cursor.execute(insert_compite, (id_competencia, id_competidor))
+            
+            # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
+            insert_puede_tener = """
+            INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            VALUES (%s, %s)
+            """
+            cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
+            
+            # Confirmar los cambios en la base de datos
+            mysql.connection.commit()
+            
+            cursor.close()
+            
+            # Redirigir a una página de éxito o a la página principal
+            return redirect(url_for('home'))
         
-        if competidor_exists:
-            flash('Este CI o correo ya está registrado', 'error')
-            return redirect(url_for('inscribirse'))
-        
-        # Insertar nuevo competidor
-        cursor.execute(
-            """INSERT INTO competidor 
-            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia, estado) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (ci, nombre, apellido, email, telefono, fecha_nacimiento, colegio, curso, departamento, provincia, estado)
-        )
-        
-        mysql.connection.commit()
-        flash('Te has registrado como competidor correctamente. Ahora puedes iniciar sesión.', 'success')
-        return redirect(url_for('login'))
-        
-    return redirect(url_for('inscribirse'))
+        except Exception as e:
+            # En caso de error, devolver un mensaje o redirigir a una página de error
+            print('error en el registro:', e)
+            return str(e)
+    
+    # Si la solicitud no es POST, redirigir a la página principal
+    return redirect(url_for('home'))
 
 @app.route('/obtener_tutores')
 def obtener_tutores():
@@ -312,10 +383,28 @@ def obtener_tutores_completos():
         cursor = mysql.connection.cursor()
         
         # Consulta SQL para obtener todos los datos de los tutores
-        cursor.execute("SELECT id_usuario, nombre, apellido, email, telefono FROM Usuario WHERE rol = 'tutor'")
+        # Ahora incluye el id_tutor de la tabla de tutores
+        cursor.execute("""
+            SELECT u.id_usuario, t.id_tutor, u.nombre, u.apellido, u.email, u.telefono 
+            FROM Usuario u
+            INNER JOIN tutor t ON u.id_usuario = t.id_usuario
+            WHERE u.rol = 'tutor'
+        """)
         
         # Obtener los resultados
-        tutores = cursor.fetchall()
+        tutores_raw = cursor.fetchall()
+        
+        # Convertir los resultados a una lista de diccionarios
+        tutores = []
+        for tutor in tutores_raw:
+            tutores.append({
+                'id_usuario': tutor['id_usuario'],
+                'id_tutor': tutor['id_tutor'],
+                'nombre': tutor['nombre'],
+                'apellido': tutor['apellido'],
+                'email': tutor['email'],
+                'telefono': tutor['telefono']
+            })
         
         # Cerrar el cursor
         cursor.close()
