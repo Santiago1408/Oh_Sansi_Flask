@@ -68,7 +68,30 @@ def adminareas():
 @app.route('/cajero')
 @cajero_required
 def cajero():
-    return render_template('cajero.html')
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * FROM competidor WHERE estado = 'validado'"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('cajero.html', data=data)
+
+@app.route('/confirmar-pago', methods=['POST'])
+@cajero_required
+def confirmar_pago():
+    try:
+        id_competidor = request.form['id_competidor']
+        print("ID Competidor:", id_competidor)
+        cursor = mysql.connection.cursor()
+        sql = "UPDATE competidor SET estado = 'registrado' WHERE id_competidor = %s"
+        cursor.execute(sql, (id_competidor,))
+        mysql.connection.commit()
+        
+        flash('Pago confirmado correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al confirmar el pago: {str(e)}', 'danger')
+    
+    return redirect(url_for('cajero'))
+
 
 @app.route('/tutor')
 @tutor_required
@@ -77,7 +100,7 @@ def tutor():
     tutor_id = session.get('tutor_id')
     cursor = mysql.connection.cursor()
     sql = "SELECT * from competidor WHERE id_tutor = %s and estado = 'pendiente'"
-    sql2 = "SELECT * from competidor WHERE id_tutor = %s and estado = 'validado'"
+    sql2 = "SELECT * from competidor WHERE id_tutor = %s and estado = 'registrado'"
     cursor.execute(sql, (tutor_id,))
     data = cursor.fetchall() 
     cursor.execute(sql2, (tutor_id,))
@@ -105,7 +128,12 @@ def validar_competidor():
 @app.route('/admin-reportes')
 @admin_required
 def adminreportes():
-    return render_template('admin-reportes.html')
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * FROM competidor WHERE estado = 'registrado'"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    num_competidores = len(data)
+    return render_template('admin-reportes.html', num_competidores=num_competidores)
 
 @app.route('/admin-competencia')
 @admin_required

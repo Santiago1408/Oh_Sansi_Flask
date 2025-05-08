@@ -1,6 +1,20 @@
 {% extends './menu-home.html' %}
 {% block title %}Cajero{% endblock %}
-
 {% block content %}
-<h1>Cajero</h1>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cajero.css') }}">
+<main>
+    <div class="items">
+        <h3 id="tituloLista">Estudiantes:</h3>
+        {% for estudiante in data %}
+        <form action="{{url_for('confirmar_pago')}}" method="POST" class="formulario">
+            <p class="estudiante">{{estudiante.nombre}}  {{estudiante.apellido}}</p>
+            <input type="hidden" name="id_competidor" value="{{estudiante.id_competidor}}">
+            <button type="submit"> <i class="bi bi-check-circle" id="ok"></i></button>
+        </form>
+
+        {% endfor %}
+    </div>
+    <img src="{{url_for('static', filename='images/cubos.png')}}" alt="" srcset="" id="imagen">
+</main>
 {% endblock%}
