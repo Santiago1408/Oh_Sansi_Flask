@@ -1,66 +1,77 @@
-{%extends './menu-admin.html'%}
-{%block title%}Administrar Competencia{%endblock%}
-{%block content%}
+{% extends './menu-admin.html' %}
+{% block title %}Administrar Competencia{% endblock %}
+{% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-competencia.css') }}">
-<div class="contenido">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('admin_competencia') }}">
+  <div class="contenido">
     <div class="bloque">
       <h2>PROCESO DE INSCRIPCIÓN</h2>
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniIns">
+          <input type="date" name="fechaIniIns" value="{{ datos.inscripcion[0] if datos.inscripcion else '' }}" min="{{fecha_hoy}}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinIns">
+          <input type="date" name="fechaFinIns" value="{{ datos.inscripcion[1] if datos.inscripcion else '' }}" min="{{fecha_hoy}}">
         </div>
       </div>
     </div>
-  
+
     <div class="bloque">
       <h2>PROCESO DE VALIDACIÓN DE INSCRIPCIÓN</h2>
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniVal">
+          <input type="date" name="fechaIniVal" value="{{ datos.validacion[0] if datos.validacion else '' }}"min="{{fecha_hoy}}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinVal">
+          <input type="date" name="fechaFinVal" value="{{ datos.validacion[1] if datos.validacion else '' }}"min="{{fecha_hoy}}">
         </div>
       </div>
     </div>
-  
+
     <div class="bloque">
       <h2>PROCESO DE PAGOS DE INSCRIPCIÓN</h2>
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniPag">
+          <input type="date" name="fechaIniPag" value="{{ datos.pago[0] if datos.pago else '' }}"min="{{fecha_hoy}}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinPag">
+          <input type="date" name="fechaFinPag" value="{{ datos.pago[1] if datos.pago else '' }}"min="{{fecha_hoy}}">
         </div>
       </div>
     </div>
-  
+
     <div class="bloque">
       <h2>PERIODO DE COMPETENCIA</h2>
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniComp">
+          <input type="date" name="fechaIniComp" value="{{ datos.competencia[0] if datos.competencia else '' }}"min="{{fecha_hoy}}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinComp">
+          <input type="date" name="fechaFinComp" value="{{ datos.competencia[1] if datos.competencia else '' }}"min="{{fecha_hoy}}">
         </div>
       </div>
     </div>
   </div>
-  
+
   <div class="contenedor-boton">
     <button class="boton" type="submit">Guardar</button>
   </div>
-{%endblock content%}
+</form>
+{% endblock %}
