@@ -1,5 +1,35 @@
 {% extends './menu-home.html' %}
 {% block title %}Tutor{% endblock %}
 {% block content %}
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutor.css') }}">
+<div class="contenido">
+    <div class="paneles">
+      <div class="seccion1">
+        <h2>Estudiantes:</h2>
+        <p>{{tutor_id}}</p>
+        {%for competidor in data%}
+        <div class="entrada">
+            <label>{{competidor.nombre}} {{competidor.apellido}}</label>
+            <form class="acciones" action="{{ url_for('validar_competidor') }}" method="POST">
+                <input type="hidden" name="id_competidor" value="{{competidor.id_competidor}}">
+                <a class="btn btn-fail">
+                  <i class="bi bi-x-circle" id="nope"></i>
+                </a>
+                <button type="submit"> <i class="bi bi-check-circle" id="ok"></i></button>
+            </form>
+        </div>
+        {%endfor%}
+      </div>
+      <div class="seccion2">
+        <h2>Mis estudiantes:</h2>
+        {%for competidor in data2%}
+        <div class="entrada">
+          <label>{{competidor.nombre}} {{competidor.apellido}}</label>
+        </div>
+        {%endfor%}
+      </div>
+    </div>
+        <a href="{{url_for('inscribirse')}}" class="boton">Inscribir a un estudiate</a>
+    </div>
 {% endblock %}

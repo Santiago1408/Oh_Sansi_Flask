@@ -53,11 +53,6 @@ def competidor_required(f):
 
 @app.route('/')
 def home():
-    cursor = mysql.connection.cursor()
-    sql = "SELECT * FROM competencia"
-    cursor.execute(sql)
-    data = cursor.fetchall()
-    print(data)
     return render_template('home.html')
 
 @app.route('/admin-areas')
@@ -78,12 +73,34 @@ def cajero():
 @app.route('/tutor')
 @tutor_required
 def tutor():
-    return render_template('tutor.html')
+    # Obtener el ID del tutor de la sesión
+    tutor_id = session.get('tutor_id')
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * from competidor WHERE id_tutor = %s and estado = 'pendiente'"
+    sql2 = "SELECT * from competidor WHERE id_tutor = %s and estado = 'validado'"
+    cursor.execute(sql, (tutor_id,))
+    data = cursor.fetchall() 
+    cursor.execute(sql2, (tutor_id,))
+    data2 = cursor.fetchall()   
+    return render_template('tutor.html', data=data, data2=data2)
 
-@app.route('/inscripcion')
-@login_required
-def inscripcion():
-    return render_template('inscripcion.html')
+@app.route('/validar-competidor', methods=['POST'])
+@tutor_required
+def validar_competidor():
+    try:
+        id_competidor = request.form['id_competidor']
+        print("ID Competidor:", id_competidor)
+        cursor = mysql.connection.cursor()
+        sql = "UPDATE competidor SET estado = 'validado' WHERE id_competidor = %s"
+        cursor.execute(sql, (id_competidor,))
+        mysql.connection.commit()
+        
+        flash('Competidor validado correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al validar el competidor: {str(e)}', 'danger')
+    
+    return redirect(url_for('tutor'))
 
 @app.route('/admin-reportes')
 @admin_required
@@ -154,7 +171,7 @@ def login():
             if tutor:
                 session['tutor_id'] = tutor['id_tutor']
             return redirect(url_for('tutor'))
-            
+          
         elif user['rol'] == 'competidor':
             # Para el competidor, se busca en la tabla de competidor por la relación con usuario
             # Esto depende de cómo esté estructurada tu base de datos

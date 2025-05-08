@@ -1,0 +1,83 @@
+
+  .contenido {
+    padding: 20px;
+    position: relative;
+    min-height: 80vh;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+  
+  .paneles {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  
+  .seccion1,
+  .seccion2 {
+    flex: 1;
+  }
+  
+  h2 {
+    font-size: 16px;
+    color: #1c1c1c;
+  }
+  
+  .entrada {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .entrada label {
+    flex: 1;
+    padding: 8px 0;
+    border-bottom: 1px solid #999;
+  }
+  
+  .acciones {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .acciones img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  
+  .boton {
+    background-color: #1e3656;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+  }
+  
+  .boton:hover {
+    background-color: #080213;
+  }
+
+  #ok{
+    color:rgb(45, 214, 214);
+    font-size: 25px;
+    margin-top: 5px;
+  }
+  #nope{
+    color:rgb(45, 214, 214);
+    font-size: 25px;
+  }
+
+  i{
+    cursor: pointer;
+  }
+  
