@@ -42,14 +42,27 @@ def tutor_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def competidor_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session or session['rol'] != 'competidor':
-            flash('No tienes permisos para acceder a esta página', 'error')
-            return redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return decorated_function
+@app.route('/competidor')
+def competidor():
+    # Verificar si el usuario ha iniciado sesión como competidor
+    if 'competidor_id' not in session or 'rol' not in session or session['rol'] != 'competidor':
+        flash('Debe iniciar sesión como competidor para acceder a esta página', 'error')
+        return redirect(url_for('login'))
+    
+    # Obtener los datos del competidor desde la base de datos
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT nombre, apellido, estado FROM competidor WHERE id_competidor = %s", [session['competidor_id']])
+    competidor_data = cursor.fetchone()
+    cursor.close()
+    
+    if not competidor_data:
+        flash('Error al cargar los datos del competidor', 'error')
+        return redirect(url_for('login'))
+    
+    # Obtener las competencias disponibles para el competidor
+    
+    return render_template('competidor.html', 
+                          competidor=competidor_data)
 
 @app.route('/')
 def home():
@@ -73,6 +86,15 @@ def cajero():
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('cajero.html', data=data)
+
+def competidor_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'competidor_id' not in session or 'rol' not in session or session['rol'] != 'competidor':
+            flash('Debe iniciar sesión como competidor para acceder a esta página', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/confirmar-pago', methods=['POST'])
 @cajero_required
@@ -154,65 +176,69 @@ def login():
             flash('Formato de correo electrónico inválido', 'error')
             return render_template('login.html')
         
-        # Verificar si el usuario existe en la base de datos
+        contrasenia = request.form['password']
         cursor = mysql.connection.cursor()
         
-        # Consultar la tabla de usuarios
+        # Intentar encontrar el usuario en la tabla usuario
         cursor.execute("SELECT * FROM usuario WHERE email = %s", [email])
         user = cursor.fetchone()
         
-        if not user:
-            flash('Usuario no encontrado', 'error')
-            return render_template('login.html')
-        
-        # Verificar la contraseña
-        contrasenia = request.form['password']
-        if user['contrasenia'] != contrasenia:
-            flash('Contraseña incorrecta', 'error')
-            return render_template('login.html')
+        if user:
+            if user['contrasenia'] != contrasenia:
+                flash('Contraseña incorrecta', 'error')
+                return render_template('login.html')
+            
+            session['user_id'] = user['id_usuario']
+            session['nombre'] = user['nombre']
+            session['apellido'] = user['apellido']
+            session['email'] = user['email']
+            session['rol'] = user['rol']
+            
+            if user['rol'] == 'administrador':
+                cursor.execute("SELECT id_administrador FROM administrador WHERE id_usuario = %s", [user['id_usuario']])
+                admin = cursor.fetchone()
+                if admin:
+                    session['admin_id'] = admin['id_administrador']
+                return redirect(url_for('admincompetencia'))
 
-        # Guardar información básica del usuario en la sesión
-        session['user_id'] = user['id_usuario']
-        session['nombre'] = user['nombre']
-        session['apellido'] = user['apellido']
-        session['email'] = user['email']
-        session['rol'] = user['rol']
-        
-        # Determinar el tipo específico de usuario y obtener su ID específico
-        if user['rol'] == 'administrador':
-            cursor.execute("SELECT id_administrador FROM administrador WHERE id_usuario = %s", [user['id_usuario']])
-            admin = cursor.fetchone()
-            if admin:
-                session['admin_id'] = admin['id_administrador']
-            return redirect(url_for('admincompetencia'))
-            
-        elif user['rol'] == 'cajero':
-            cursor.execute("SELECT id_cajero FROM cajero WHERE id_usuario = %s", [user['id_usuario']])
-            cajero = cursor.fetchone()
-            if cajero:
-                session['cajero_id'] = cajero['id_cajero']
-            return redirect(url_for('cajero'))
-            
-        elif user['rol'] == 'tutor':
-            cursor.execute("SELECT id_tutor FROM tutor WHERE id_usuario = %s", [user['id_usuario']])
-            tutor = cursor.fetchone()
-            if tutor:
-                session['tutor_id'] = tutor['id_tutor']
-            return redirect(url_for('tutor'))
-          
-        elif user['rol'] == 'competidor':
-            # Para el competidor, se busca en la tabla de competidor por la relación con usuario
-            # Esto depende de cómo esté estructurada tu base de datos
-            cursor.execute("SELECT * FROM competidor WHERE email = %s", [user['email']])
+            elif user['rol'] == 'cajero':
+                cursor.execute("SELECT id_cajero FROM cajero WHERE id_usuario = %s", [user['id_usuario']])
+                cajero = cursor.fetchone()
+                if cajero:
+                    session['cajero_id'] = cajero['id_cajero']
+                return redirect(url_for('cajero'))
+
+            elif user['rol'] == 'tutor':
+                cursor.execute("SELECT id_tutor FROM tutor WHERE id_usuario = %s", [user['id_usuario']])
+                tutor = cursor.fetchone()
+                if tutor:
+                    session['tutor_id'] = tutor['id_tutor']
+                return redirect(url_for('tutor'))
+
+            flash('Tipo de usuario no identificado', 'error')
+            return redirect(url_for('login'))
+        else:
+            # Si no se encontró en usuario, buscar en competidor
+            cursor.execute("SELECT * FROM competidor WHERE email = %s", [email])
             competidor = cursor.fetchone()
+
             if competidor:
-                session['competidor_id'] = competidor['id_competidor']
-            return redirect(url_for('inscripcion'))
-        
-        # Si no se identifica el rol específico
-        flash('Tipo de usuario no identificado', 'error')
-        return redirect(url_for('login'))
-        
+                # Validar usando el campo 'ci' como contraseña
+                if str(competidor['ci']) == contrasenia:
+                    session['competidor_id'] = competidor['id_competidor']
+                    session['nombre'] = competidor['nombre']
+                    session['apellido'] = competidor['apellido']
+                    session['email'] = competidor['email']
+                    session['rol'] = 'competidor'  # Agregar el rol para validaciones
+                    return redirect('/competidor')
+                else:
+                    flash('Contraseña incorrecta', 'error')
+                    return render_template('login.html')
+            else:
+                # Si no se encontró en ninguna tabla
+                flash('Usuario no encontrado', 'error')
+                return render_template('login.html')
+    
     return render_template('login.html')
 
 @app.route('/logout')

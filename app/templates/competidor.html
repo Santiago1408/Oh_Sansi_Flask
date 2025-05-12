@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/competidor.css') }}">
+    <title></title>
+</head>
+<body>
+    <script src="https://kit.fontawesome.com/a09bd82edd.js" crossorigin="anonymous"></script>
+    <header>
+        <div class="logo">
+            <img src="{{url_for('static', filename='images/logo-sansi.png')}}" alt="" />
+            <h1 class="oh-sansi"><a href="{{url_for('home')}}">Oh! Sansi</a></h1>
+        </div>
+        <nav>
+            <a href="" id="compet">Competidor</a>
+            <i class="fa-solid fa-circle-user"></i>
+        </nav>
+    </header>
+
+    <h2 class="titulo">Estado de la inscripción</h2>
+
+    <div class="card shadow">
+        <label for="competencia">Seleccione su competencia:</label>
+        
+        <select id="competencia">
+            <option value="" selected disabled></option>
+        </select>
+
+        <p><strong>Nombre:</strong> {{ competidor.nombre }}</p>
+        <p><strong>Apellidos:</strong> {{ competidor.apellido }}</p>
+        <p><strong>Estado de Inscripción:</strong> {{ competidor.estado }}</p>
+    </div>
+
+    <div class="mensaje">
+        <label for="msg">Mensajes para mí:</label>
+        <div class="cuadro-mensaje">
+            
+        </div>
+    </div>
+</body>
+</html>
