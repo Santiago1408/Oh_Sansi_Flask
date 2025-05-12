@@ -92,7 +92,6 @@ def confirmar_pago():
     
     return redirect(url_for('cajero'))
 
-
 @app.route('/tutor')
 @tutor_required
 def tutor():
@@ -208,6 +207,7 @@ def login():
             if competidor:
                 session['competidor_id'] = competidor['id_competidor']
             return redirect(url_for('inscripcion'))
+        
         
         # Si no se identifica el rol específico
         flash('Tipo de usuario no identificado', 'error')
@@ -345,15 +345,15 @@ def registrar_competidor():
         estado = 'pendiente'
         
         try:
-            print("Datos recibidos:")
+            print(id_tutor)
             cursor = mysql.connection.cursor()
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -376,7 +376,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia[0]
+                id_competencia = competencia['id_competencia']
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -387,7 +387,7 @@ def registrar_competidor():
             
             # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
             insert_puede_tener = """
-            INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            INSERT INTO puede_tener (id_tutor, id_competidor)
             VALUES (%s, %s)
             """
             cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
