@@ -51,7 +51,7 @@ def competidor():
     
     # Obtener los datos del competidor desde la base de datos
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT nombre, apellido, estado FROM competidor WHERE id_competidor = %s", [session['competidor_id']])
+    cursor.execute("SELECT nombre, apellido, estado, mensaje FROM competidor WHERE id_competidor = %s", [session['competidor_id']])
     competidor_data = cursor.fetchone()
     cursor.close()
     
@@ -371,15 +371,15 @@ def registrar_competidor():
         estado = 'pendiente'
         
         try:
-            print("Datos recibidos:")
+            print(id_tutor)
             cursor = mysql.connection.cursor()
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -402,7 +402,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia[0]
+                id_competencia = competencia['id_competencia']
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -413,7 +413,7 @@ def registrar_competidor():
             
             # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
             insert_puede_tener = """
-            INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            INSERT INTO puede_tener (id_tutor, id_competidor)
             VALUES (%s, %s)
             """
             cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
@@ -514,3 +514,24 @@ def eliminar_competencia():
     cursor.close()
     flash('Competencia eliminada correctamente', 'success')
     return redirect(url_for('adminareas'))
+
+# Funcion del motivo por el cual fue rechazado el tutor
+@app.route('/rechazar_competidor', methods=['POST'])
+@tutor_required
+def rechazar_competidor():
+    try:
+        id_competidor = request.form['id_competidor']
+        mensaje = request.form['motivo']  
+
+        cursor = mysql.connection.cursor()
+        sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
+        cursor.execute(sql, (mensaje, id_competidor))
+        mysql.connection.commit()
+
+        flash('Competidor rechazado con mensaje registrado', 'info')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al rechazar el competidor: {str(e)}', 'danger')
+    
+    return redirect(url_for('tutor'))
+
