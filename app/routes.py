@@ -49,20 +49,55 @@ def competidor():
         flash('Debe iniciar sesión como competidor para acceder a esta página', 'error')
         return redirect(url_for('login'))
     
-    # Obtener los datos del competidor desde la base de datos
+    # Obtener los datos del competidor
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT nombre, apellido, estado FROM competidor WHERE id_competidor = %s", [session['competidor_id']])
+    cursor.execute("SELECT id_competidor, nombre, apellido, estado FROM competidor WHERE id_competidor = %s", 
+                  [session['competidor_id']])
     competidor_data = cursor.fetchone()
-    cursor.close()
     
     if not competidor_data:
         flash('Error al cargar los datos del competidor', 'error')
         return redirect(url_for('login'))
     
-    # Obtener las competencias disponibles para el competidor
+    # Obtener las competencias en las que está inscrito el competidor
+    cursor.execute("""
+        SELECT c.id_competencia, c.area, c.categoria, c.grado
+        FROM competencia c 
+        JOIN compite cm ON c.id_competencia = cm.id_competencia 
+        WHERE cm.id_competidor = %s
+    """, [session['competidor_id']])
+    competencias = cursor.fetchall()
+    cursor.close()
     
     return render_template('competidor.html', 
-                          competidor=competidor_data)
+                          competidor=competidor_data,
+                          competencias=competencias)
+
+@app.route('/competidor/detalles_competencia/<int:id_competencia>')
+def detalles_competencia(id_competencia):
+    if 'competidor_id' not in session or 'rol' not in session or session['rol'] != 'competidor':
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+        SELECT c.area, c.categoria, c.grado, co.estado 
+        FROM competencia c, compite co
+        JOIN compite co ON c.id_competencia = co.id_competencia 
+        WHERE co.id_competidor = %s AND c.id_competencia = %s
+    """, [session['competidor_id'], id_competencia])
+    
+    detalles = cursor.fetchone()
+    cursor.close()
+    
+    if not detalles:
+        return jsonify({'error': 'Competencia no encontrada'}), 404
+    
+    return jsonify({
+        'area': detalles['area'],
+        'categoria': detalles['categoria'],
+        'grado': detalles['grado'],
+        'estado': detalles['estado']
+    })
 
 @app.route('/')
 def home():
@@ -371,15 +406,15 @@ def registrar_competidor():
         estado = 'pendiente'
         
         try:
-            print("Datos recibidos:")
+            print(id_tutor)
             cursor = mysql.connection.cursor()
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -402,7 +437,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia[0]
+                id_competencia = competencia['id_competencia']
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -413,7 +448,7 @@ def registrar_competidor():
             
             # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
             insert_puede_tener = """
-            INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            INSERT INTO puede_tener (id_tutor, id_competidor)
             VALUES (%s, %s)
             """
             cursor.execute(insert_puede_tener, (id_tutor, id_competidor))

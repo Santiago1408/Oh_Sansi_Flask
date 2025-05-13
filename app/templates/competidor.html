@@ -24,12 +24,20 @@
     <div class="card shadow">
         <label for="competencia">Seleccione su competencia:</label>
         
-        <select id="competencia">
-            <option value="" selected disabled></option>
+        <select id="competencia" onchange="mostrarDetallesCompetencia()">
+            <option value="" selected disabled>Seleccione una competencia</option>
+            {% for comp in competencias %}
+                <option value="{{ loop.index0 }}" data-area="{{ comp.area }}" data-categoria="{{ comp.categoria }}" data-grado="{{ comp.grado }}">
+                    {{ comp.area }} - {{ comp.categoria }} ({{ comp.grado }})
+                </option>
+            {% endfor %}
         </select>
 
         <p><strong>Nombre:</strong> {{ competidor.nombre }}</p>
         <p><strong>Apellidos:</strong> {{ competidor.apellido }}</p>
+        <p><strong>Área:</strong> <span id="area-competencia">-</span></p>
+        <p><strong>Categoría:</strong> <span id="categoria-competencia">-</span></p>
+        <p><strong>Grado:</strong> <span id="grado-competencia">-</span></p>
         <p><strong>Estado de Inscripción:</strong> {{ competidor.estado }}</p>
     </div>
 
@@ -39,5 +47,24 @@
             
         </div>
     </div>
+
+    <script>
+        function mostrarDetallesCompetencia() {
+            const selectElement = document.getElementById('competencia');
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            
+            if (selectedOption.value !== "") {
+                // Obtener datos de la opción seleccionada
+                const area = selectedOption.dataset.area;
+                const categoria = selectedOption.dataset.categoria;
+                const grado = selectedOption.dataset.grado;
+                
+                // Actualizar los campos en la página
+                document.getElementById('area-competencia').textContent = area;
+                document.getElementById('categoria-competencia').textContent = categoria;
+                document.getElementById('grado-competencia').textContent = grado;
+            }
+        }
+    </script>
 </body>
 </html>
