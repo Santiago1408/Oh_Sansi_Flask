@@ -3,8 +3,6 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
 
-
-
 <div class="formulario">
     <h2 id="titFormulario">Registro</h2>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -59,6 +57,33 @@
                     <option value="cajero">Cajero</option>
                 </select>
                 <span id="rol-error" class="error-message"></span>
+
+                <div id="tutor-section" style="display: none;">
+                    <p>Tutor:</p>
+                    <p class="mensaje-rol">Por favor escoja el tutor que desee para la cuenta</p>
+                    <select name="tipoTutor" id="tipoTutor">
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="padre">Padre</option>
+                        <option value="madre">Madre</option>
+                        <option value="profesor">Profesor</option>
+                    </select>
+                    <span id="tipoTutor-error" class="error-message"></span>
+
+                    <p>Área:</p>
+                    <p class="mensaje-rol">Por favor escoja el Area que desee para la cuenta</p>
+                    <select name="area" id="area">
+                        <option value="" disabled selected>Seleccione un área</option>
+                        <option value="astronomia-astrofisica">Astronomía y Astrofísica</option>
+                        <option value="biologia">Biología</option>
+                        <option value="fisica">Física</option>
+                        <option value="informatica">Informática</option>
+                        <option value="matematica">Matemática</option>
+                        <option value="quimica">Química</option>
+                        <option value="robotica">Robótica</option>
+                    </select>
+                    <span id="area-error" class="error-message"></span>
+                </div>
+
                 <p>Contraseña:</p>
                 <input type="password" name="password" id="password" required>
                 <span id="password-error" class="error-message"></span>
@@ -73,7 +98,19 @@
         </div>
     </form>
 </div>
+
 <script>
+
+    document.getElementById('rol').addEventListener('change', function () {
+        const tutorSection = document.getElementById('tutor-section');
+
+        if (this.value === 'tutor') {
+            tutorSection.style.display = 'block';
+        } else {
+            tutorSection.style.display = 'none';
+        }
+    });
+
     document.getElementById('formularioRegistro').addEventListener('submit', function (event) {
         let valid = true;
 
