@@ -100,7 +100,7 @@
 </div>
 
 <script>
-
+    // Función para mostrar/ocultar sección de tutor
     document.getElementById('rol').addEventListener('change', function () {
         const tutorSection = document.getElementById('tutor-section');
 
@@ -111,29 +111,197 @@
         }
     });
 
+    // VALIDACIÓN EN TIEMPO REAL
+    
+    // Validación de nombres en tiempo real
+    document.getElementById('nombres').addEventListener('input', function() {
+        const nombres = this.value.trim();
+        const nombreApellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+        const errorElement = document.getElementById('nombres-error');
+        
+        if (nombres === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!nombreApellidoRegex.test(nombres)) {
+            errorElement.textContent = 'Ingrese un nombre válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de apellidos en tiempo real
+    document.getElementById('apellidos').addEventListener('input', function() {
+        const apellidos = this.value.trim();
+        const nombreApellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+        const errorElement = document.getElementById('apellidos-error');
+        
+        if (apellidos === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!nombreApellidoRegex.test(apellidos)) {
+            errorElement.textContent = 'Ingrese un apellido válido (solo letras y espacios, entre 2 y 50 caracteres).';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de fecha de nacimiento en tiempo real
+    document.getElementById('fechaNacimiento').addEventListener('change', function() {
+        const fechaNacimiento = new Date(this.value);
+        const hoy = new Date();
+        const edadMinima = 18;
+        const edadMaxima = 100;
+        const errorElement = document.getElementById('fechaNacimiento-error');
+        
+        if (this.value === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+            return;
+        }
+        
+        const edadActual = hoy.getFullYear() - fechaNacimiento.getFullYear();
+        const mesActual = hoy.getMonth() - fechaNacimiento.getMonth();
+        const diaActual = hoy.getDate() - fechaNacimiento.getDate();
+        
+        // Ajustar edad si aún no ha cumplido años este año
+        let edadReal = edadActual;
+        if (mesActual < 0 || (mesActual === 0 && diaActual < 0)) {
+            edadReal--;
+        }
+        
+        if (fechaNacimiento > hoy || edadReal < edadMinima || edadReal > edadMaxima) {
+            errorElement.textContent = 'Debe tener entre 18 y 100 años.';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de carnet de identidad en tiempo real
+    document.getElementById('ci').addEventListener('input', function() {
+        const ci = this.value.trim();
+        const ciRegex = /^\d{5,11}(-[A-Za-z\d]{1,2})?$/;
+        const errorElement = document.getElementById('ci-error');
+        
+        if (ci === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!ciRegex.test(ci)) {
+            errorElement.textContent = 'Ingrese un CI válido (ejemplo: 123456-1A o solo números).';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de email en tiempo real
+    document.getElementById('email').addEventListener('input', function() {
+        const email = this.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const errorElement = document.getElementById('email-error');
+        
+        if (email === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!emailRegex.test(email)) {
+            errorElement.textContent = 'Ingrese un correo electrónico válido.';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de número de celular en tiempo real
+    document.getElementById('numCelular').addEventListener('input', function() {
+        const numCelular = this.value.trim();
+        const numCelularRegex = /^[67]\d{7}$/;
+        const errorElement = document.getElementById('numCelular-error');
+        
+        if (numCelular === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!numCelularRegex.test(numCelular)) {
+            errorElement.textContent = 'Ingrese un número de celular válido (8 dígitos, comenzando con 6 o 7).';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    });
+
+    // Validación de contraseña en tiempo real
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>,.?~`|{}[\]\\-])[A-Za-z\d!@#$%^&*()_+=<>,.?~`|{}[\]\\-]{8,}$/;
+        const errorElement = document.getElementById('password-error');
+        
+        if (password === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (!passwordRequirements.test(password)) {
+            errorElement.textContent = 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial permitido.';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+        
+        // También validar confirmación de contraseña si ya tiene valor
+        validatePasswordConfirmation();
+    });
+
+    // Validación de confirmación de contraseña en tiempo real
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        validatePasswordConfirmation();
+    });
+
+    function validatePasswordConfirmation() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const errorElement = document.getElementById('error-message');
+        
+        if (confirmPassword === '') {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        } else if (password !== confirmPassword) {
+            errorElement.textContent = 'Las contraseñas no coinciden.';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+    }
+
+    // VALIDACIÓN FINAL AL ENVIAR EL FORMULARIO
     document.getElementById('formularioRegistro').addEventListener('submit', function (event) {
         let valid = true;
 
+        // Validar nombres
         const nombres = document.getElementById('nombres').value.trim();
-        const apellidos = document.getElementById('apellidos').value.trim();
         const nombreApellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
 
         if (!nombreApellidoRegex.test(nombres)) {
             document.getElementById('nombres-error').textContent = 'Ingrese un nombre válido (solo letras y espacios, entre 2 y 50 caracteres).';
             document.getElementById('nombres-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('nombres-error').style.display = 'none';
         }
 
+        // Validar apellidos
+        const apellidos = document.getElementById('apellidos').value.trim();
         if (!nombreApellidoRegex.test(apellidos)) {
             document.getElementById('apellidos-error').textContent = 'Ingrese un apellido válido (solo letras y espacios, entre 2 y 50 caracteres).';
             document.getElementById('apellidos-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('apellidos-error').style.display = 'none';
         }
 
+        // Validar fecha de nacimiento
         const fechaNacimiento = new Date(document.getElementById('fechaNacimiento').value);
         const hoy = new Date();
         const edadMinima = 18;
@@ -144,10 +312,9 @@
             document.getElementById('fechaNacimiento-error').textContent = 'Debe tener entre 18 y 100 años.';
             document.getElementById('fechaNacimiento-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('fechaNacimiento-error').style.display = 'none';
         }
 
+        // Validar CI
         const ci = document.getElementById('ci').value.trim();
         const ciRegex = /^\d{5,11}(-[A-Za-z\d]{1,2})?$/;
 
@@ -155,10 +322,9 @@
             document.getElementById('ci-error').textContent = 'Ingrese un CI válido (ejemplo: 123456-1A o solo números).';
             document.getElementById('ci-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('ci-error').style.display = 'none';
         }
 
+        // Validar email
         const email = document.getElementById('email').value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -166,10 +332,9 @@
             document.getElementById('email-error').textContent = 'Ingrese un correo electrónico válido.';
             document.getElementById('email-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('email-error').style.display = 'none';
         }
 
+        // Validar número de celular
         const numCelular = document.getElementById('numCelular').value.trim();
         const numCelularRegex = /^[67]\d{7}$/;
 
@@ -177,19 +342,17 @@
             document.getElementById('numCelular-error').textContent = 'Ingrese un número de celular válido (8 dígitos, comenzando con 6 o 7).';
             document.getElementById('numCelular-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('numCelular-error').style.display = 'none';
         }
 
+        // Validar rol
         const rol = document.getElementById('rol').value;
         if (!['tutor', 'administrador', 'cajero'].includes(rol)) {
             document.getElementById('rol-error').textContent = 'Seleccione un rol válido.';
             document.getElementById('rol-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('rol-error').style.display = 'none';
         }
 
+        // Validar contraseña
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm_password').value;
         const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=<>,.?~`|{}[\]\\-])[A-Za-z\d!@#$%^&*()_+=<>,.?~`|{}[\]\\-]{8,}$/;
@@ -198,16 +361,12 @@
             document.getElementById('password-error').textContent = 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, un número y un carácter especial permitido.';
             document.getElementById('password-error').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('password-error').style.display = 'none';
         }
 
         if (password !== confirmPassword) {
             document.getElementById('error-message').textContent = 'Las contraseñas no coinciden.';
             document.getElementById('error-message').style.display = 'block';
             valid = false;
-        } else {
-            document.getElementById('error-message').style.display = 'none';
         }
 
         if (!valid) {

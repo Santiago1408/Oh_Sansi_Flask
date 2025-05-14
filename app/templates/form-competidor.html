@@ -315,8 +315,170 @@
         document.getElementById('telefonoTutor').textContent = '';
     }
 
-    // Cargar datos cuando se carga la página
+    // VALIDACIÓN EN TIEMPO REAL
+    
+    // Validación de nombres en tiempo real
     document.addEventListener('DOMContentLoaded', function() {
+        const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+        const ciRegex = /^\d{8}$/;
+        const telefonoRegex = /^[67]\d{7}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Validación de nombres en tiempo real
+        document.getElementById('nombre').addEventListener('input', function() {
+            const nombre = this.value.trim();
+            const errorElement = document.getElementById('errorNombre');
+            
+            if (nombre === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!soloLetras.test(nombre)) {
+                errorElement.textContent = 'El nombre solo debe contener letras y espacios.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de apellidos en tiempo real
+        document.getElementById('apellido').addEventListener('input', function() {
+            const apellido = this.value.trim();
+            const errorElement = document.getElementById('errorApellido');
+            
+            if (apellido === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!soloLetras.test(apellido)) {
+                errorElement.textContent = 'El apellido solo debe contener letras y espacios.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de fecha de nacimiento en tiempo real
+        document.getElementById('fechaNacimiento').addEventListener('change', function() {
+            const fechaNacimiento = new Date(this.value);
+            const hoy = new Date();
+            const errorElement = document.getElementById('errorEdad');
+            
+            if (this.value === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+                return;
+            }
+
+            if (isNaN(fechaNacimiento)) {
+                errorElement.textContent = 'Por favor, ingrese una fecha válida.';
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+            const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+            const dia = hoy.getDate() - fechaNacimiento.getDate();
+
+            if (mes < 0 || (mes === 0 && dia < 0)) {
+                edad--;
+            }
+
+            if (edad < 8 || edad > 18) {
+                errorElement.textContent = 'La edad del competidor debe estar entre 8 y 18 años.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de carnet de identidad en tiempo real
+        document.getElementById('ci').addEventListener('input', function() {
+            const ci = this.value.trim();
+            const errorElement = document.getElementById('errorCi');
+            
+            if (ci === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!ciRegex.test(ci)) {
+                errorElement.textContent = 'El CI debe tener exactamente 8 dígitos.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de email en tiempo real
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value.trim();
+            const errorElement = document.getElementById('errorEmail');
+            
+            if (email === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!emailRegex.test(email)) {
+                errorElement.textContent = 'Ingrese un correo electrónico válido.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de número de celular en tiempo real
+        document.getElementById('telefono').addEventListener('input', function() {
+            const telefono = this.value.trim();
+            const errorElement = document.getElementById('errorTelefono');
+            
+            if (telefono === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!telefonoRegex.test(telefono)) {
+                errorElement.textContent = 'El teléfono debe iniciar con 6 o 7 y tener 8 dígitos.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de colegio en tiempo real
+        document.getElementById('colegio').addEventListener('input', function() {
+            const colegio = this.value.trim();
+            const errorElement = document.getElementById('errorColegio');
+            
+            if (colegio === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!soloLetras.test(colegio)) {
+                errorElement.textContent = 'El colegio solo debe contener letras y espacios.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Validación de provincia en tiempo real
+        document.getElementById('provincia').addEventListener('input', function() {
+            const provincia = this.value.trim();
+            const errorElement = document.getElementById('errorProvincia');
+            
+            if (provincia === '') {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            } else if (!soloLetras.test(provincia)) {
+                errorElement.textContent = 'La provincia solo debe contener letras y espacios.';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Cargar datos cuando se carga la página
         cargarTutores();
         cargarCompetencias();
 
@@ -325,7 +487,6 @@
         if (urlParams.get('inscripcion_exitosa') === '1') {
             mostrarModal();
         }
-        
         
         // Agregar el evento change al selector de tutores
         document.getElementById('tutor').addEventListener('change', function(event) {
@@ -355,7 +516,7 @@
         });
     });
 
-        // Validación de edad antes de enviar el formulario
+    // VALIDACIÓN FINAL AL ENVIAR EL FORMULARIO
     document.querySelector('form.campos').addEventListener('submit', function(event) {
         const fechaNacimientoInput = document.getElementById('fechaNacimiento');
         const errorEdadSpan = document.getElementById('errorEdad');
@@ -384,53 +545,51 @@
             event.preventDefault(); // Evita que el formulario se envíe
         }
     
-const nombre = document.getElementById('nombre').value.trim();
-const apellido = document.getElementById('apellido').value.trim();
-const colegio = document.getElementById('colegio').value.trim();
-const provincia = document.getElementById('provincia').value.trim();
-const ci = document.getElementById('ci').value.trim();
-const telefono = document.getElementById('telefono').value.trim();
-const email = document.getElementById('email').value.trim();
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellido = document.getElementById('apellido').value.trim();
+        const colegio = document.getElementById('colegio').value.trim();
+        const provincia = document.getElementById('provincia').value.trim();
+        const ci = document.getElementById('ci').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
+        const email = document.getElementById('email').value.trim();
 
-let valido = true;
+        let valido = true;
 
-const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
-const ciRegex = /^\d{8}$/;
-const telefonoRegex = /^[67]\d{7}$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+        const ciRegex = /^\d{8}$/;
+        const telefonoRegex = /^[67]\d{7}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function mostrarError(idCampo, mensaje) {
-    const span = document.getElementById(idCampo);
-    span.textContent = mensaje;
-    span.style.display = 'block';
-    valido = false;
-}
+        function mostrarError(idCampo, mensaje) {
+            const span = document.getElementById(idCampo);
+            span.textContent = mensaje;
+            span.style.display = 'block';
+            valido = false;
+        }
 
-function limpiarError(idCampo) {
-    const span = document.getElementById(idCampo);
-    span.textContent = '';
-    span.style.display = 'none';
-}
+        function limpiarError(idCampo) {
+            const span = document.getElementById(idCampo);
+            span.textContent = '';
+            span.style.display = 'none';
+        }
 
-nombre && soloLetras.test(nombre) ? limpiarError('errorNombre') : mostrarError('errorNombre', 'Campo Nombre es obligatorio, solo letras.');
-apellido && soloLetras.test(apellido) ? limpiarError('errorApellido') : mostrarError('errorApellido', 'Campo Apellido es obligatorio, solo letras.');
-colegio && soloLetras.test(colegio) ? limpiarError('errorColegio') : mostrarError('errorColegio', 'Campo Colegio es obligatorio, solo letras.');
-provincia && soloLetras.test(provincia) ? limpiarError('errorProvincia') : mostrarError('errorProvincia', 'Campo Provincia es obligatoria, solo letras.');
+        nombre && soloLetras.test(nombre) ? limpiarError('errorNombre') : mostrarError('errorNombre', 'Campo Nombre es obligatorio, solo letras.');
+        apellido && soloLetras.test(apellido) ? limpiarError('errorApellido') : mostrarError('errorApellido', 'Campo Apellido es obligatorio, solo letras.');
+        colegio && soloLetras.test(colegio) ? limpiarError('errorColegio') : mostrarError('errorColegio', 'Campo Colegio es obligatorio, solo letras.');
+        provincia && soloLetras.test(provincia) ? limpiarError('errorProvincia') : mostrarError('errorProvincia', 'Campo Provincia es obligatoria, solo letras.');
 
-// Validar CI
-ciRegex.test(ci) ? limpiarError('errorCi') : mostrarError('errorCi', 'El CI debe tener exactamente 8 dígitos.');
+        // Validar CI
+        ciRegex.test(ci) ? limpiarError('errorCi') : mostrarError('errorCi', 'El CI debe tener exactamente 8 dígitos.');
 
-// Validar teléfono
-telefonoRegex.test(telefono) ? limpiarError('errorTelefono') : mostrarError('errorTelefono', 'Teléfono debe iniciar con 6 o 7 y tener 8 dígitos.');
+        // Validar teléfono
+        telefonoRegex.test(telefono) ? limpiarError('errorTelefono') : mostrarError('errorTelefono', 'Teléfono debe iniciar con 6 o 7 y tener 8 dígitos.');
 
-// Validar email
-emailRegex.test(email) ? limpiarError('errorEmail') : mostrarError('errorEmail', 'Correo inválido.');
+        // Validar email
+        emailRegex.test(email) ? limpiarError('errorEmail') : mostrarError('errorEmail', 'Correo inválido.');
 
-if (!valido) {
-    event.preventDefault();
-}
-
+        if (!valido) {
+            event.preventDefault();
+        }
     });
-
 </script>
 {%endblock%}
