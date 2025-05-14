@@ -4,6 +4,13 @@ from app import app, mysql
 from flask import render_template, jsonify, request, redirect, url_for, session, flash
 from functools import wraps
 import re
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus.tables import TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
+from flask import make_response
 
 # Decoradores para proteger rutas según el tipo de usuario
 def login_required(f):
@@ -488,3 +495,75 @@ def eliminar_competencia():
     cursor.close()
     flash('Competencia eliminada correctamente', 'success')
     return redirect(url_for('adminareas'))
+
+@app.route('/generar-reporte-pdf', methods=['POST'])
+@admin_required
+def generar_reporte_pdf():
+    grado = request.form['grado'].strip()
+    print("Grado recibido:", grado)  
+
+    cursor = mysql.connection.cursor()
+
+    sql = """
+        SELECT nombre, apellido, ci, colegio, curso, departamento, provincia, email, telefono
+        FROM competidor
+        WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', '')) 
+          AND estado = 'registrado'
+    """
+    cursor.execute(sql, (grado,))
+    data = cursor.fetchall()
+    cursor.close()
+
+    print(f"Total filas recuperadas: {len(data)}")
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    elements.append(Paragraph(f"Reporte de Competidores - Nivel: {grado}", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    table_data = [[
+        'Nombre', 'Apellido', 'CI', 'Colegio', 'Curso',
+        'Departamento', 'Provincia', 'Email', 'Teléfono'
+    ]]
+
+    if data:
+        for row in data:
+            # Convertir cada celda a string, asegurando que no haya None
+            # y reemplazando None por una cadena vacía
+            table_data.append([
+                str(row['nombre']) if row['nombre'] is not None else '',
+                str(row['apellido']) if row['apellido'] is not None else '',
+                str(row['ci']) if row['ci'] is not None else '',
+                str(row['colegio']) if row['colegio'] is not None else '',
+                str(row['curso']) if row['curso'] is not None else '',
+                str(row['departamento']) if row['departamento'] is not None else '',
+                str(row['provincia']) if row['provincia'] is not None else '',
+                str(row['email']) if row['email'] is not None else '',
+                str(row['telefono']) if row['telefono'] is not None else ''
+            ])
+            
+    else:
+        table_data.append(['No hay datos disponibles para este nivel'] + [''] * 8)
+
+    table = Table(table_data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    buffer.seek(0)
+    response = make_response(buffer.getvalue())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=Reporte_{grado.replace(" ", "_")}.pdf'
+
+    return response

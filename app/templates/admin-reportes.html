@@ -1,29 +1,30 @@
-{%extends './menu-admin.html'%}
-{%block title%}Administrar Reportes{%endblock%}
-{%block content%}
+{% extends './menu-admin.html' %}
+{% block title %}Administrar Reportes{% endblock %}
+{% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-reportes.css') }}">
+
 <div class="campo">
-    <div class="info-total">
-      <p>Número total de estudiantes actuales inscritos en la competencia:</p>
-      <p class="cantidad">{{num_competidores}}</p>
-    </div>
-  
-    <div class="selector">
-      <label>NIVEL:</label>
-      <select class="curso">
-        <option value="1">3ro Primaria</option>
-        <option value="2">4to Primaria</option>
-        <option value="3">5to Primaria</option>
-        <option value="4">6to Primaria</option>
-        <option value="5">1ro Secundaria</option>
-        <option value="6">2do Secundaria</option>
-        <option value="7">3ro Secundaria</option>
-        <option value="8">4to Secundaria</option>
-        <option value="9">5to Secundaria</option>
-        <option value="10">6to Secundaria</option>
-      </select>
-    </div>
-  
-    <button class="Generar">Generar Reporte</button>
-  </div>  
-{%endblock content%}
+  <div class="info-total">
+    <p>Número total de estudiantes actuales inscritos en la competencia:</p>
+    <p class="cantidad">{{num_competidores}}</p>
+  </div>
+
+  <form class="selector" method="POST" action="{{ url_for('generar_reporte_pdf') }}">
+    <label for="grado">NIVEL:</label>
+    <select class="curso" name="grado" id="grado" required>
+      <option value="3ro Primaria">3ro Primaria</option>
+      <option value="4to Primaria">4to Primaria</option>
+      <option value="5to Primaria">5to Primaria</option>
+      <option value="6to Primaria">6to Primaria</option>
+      <option value="1ro Secundaria">1ro Secundaria</option>
+      <option value="2do Secundaria">2do Secundaria</option>
+      <option value="3ro Secundaria">3ro Secundaria</option>
+      <option value="4to Secundaria">4to Secundaria</option>
+      <option value="5to Secundaria">5to Secundaria</option>
+      <option value="6to Secundaria">6to Secundaria</option>
+    </select>
+
+    <button class="Generar" type="submit">Generar Reporte</button>
+  </form>
+</div>
+{% endblock content %}
