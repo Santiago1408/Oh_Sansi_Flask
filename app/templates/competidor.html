@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/competidor.css') }}">
-    <title></title>
+    <title>Estado de Inscripción</title>
+    <script src="https://kit.fontawesome.com/a09bd82edd.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <script src="https://kit.fontawesome.com/a09bd82edd.js" crossorigin="anonymous"></script>
+
     <header>
         <div class="logo">
             <img src="{{url_for('static', filename='images/logo-sansi.png')}}" alt="" />
@@ -39,6 +41,8 @@
         <p><strong>Categoría:</strong> <span id="categoria-competencia">-</span></p>
         <p><strong>Grado:</strong> <span id="grado-competencia">-</span></p>
         <p><strong>Estado de Inscripción:</strong> {{ competidor.estado }}</p>
+
+        <button class="Generar" onclick="descargarPDF()">Descargar Estado</button>
     </div>
 
     <div class="mensaje">
@@ -54,17 +58,68 @@
             const selectedOption = selectElement.options[selectElement.selectedIndex];
             
             if (selectedOption.value !== "") {
-                // Obtener datos de la opción seleccionada
                 const area = selectedOption.dataset.area;
                 const categoria = selectedOption.dataset.categoria;
                 const grado = selectedOption.dataset.grado;
-                
-                // Actualizar los campos en la página
+
                 document.getElementById('area-competencia').textContent = area;
                 document.getElementById('categoria-competencia').textContent = categoria;
                 document.getElementById('grado-competencia').textContent = grado;
             }
         }
+
+        async function descargarPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const competenciaSelect = document.getElementById('competencia');
+        const selectedOption = competenciaSelect.options[competenciaSelect.selectedIndex];
+
+        const nombre = "{{ competidor.nombre }}";
+        const apellido = "{{ competidor.apellido }}";
+        const estado = "{{ competidor.estado }}";
+
+        const area = selectedOption?.dataset.area || '-';
+        const categoria = selectedOption?.dataset.categoria || '-';
+        const grado = selectedOption?.dataset.grado || '-';
+        const competenciaTexto = selectedOption?.textContent?.trim() || 'No seleccionada';
+
+        doc.setFont("times", "bold");
+        doc.setFontSize(16);
+        doc.text("Estado de Inscripción", 105, 20, null, null, "center");
+
+        const startY = 35;
+        const rowHeight = 10;
+        const col1X = 20;
+        const col2X = 80;
+
+        const datos = [
+            ["Nombre", nombre],
+            ["Apellidos", apellido],
+            ["Competencia", competenciaTexto],
+            ["Área", area],
+            ["Categoría", categoria],
+            ["Grado", grado],
+            ["Estado de Inscripción", estado]
+        ];
+
+        doc.setFontSize(12);
+
+        datos.forEach((fila, i) => {
+            const y = startY + i * rowHeight;
+
+            doc.rect(col1X, y - 6, 55, rowHeight, "S"); 
+            doc.rect(col2X, y - 6, 100, rowHeight, "S"); 
+
+            doc.setFont("times", "bold");
+            doc.text(fila[0], col1X + 2, y);
+
+            doc.setFont("times", "normal");
+            doc.text(fila[1], col2X + 2, y);
+        });
+
+        doc.save(`estado_inscripcion_${nombre}_${apellido}.pdf`);
+    }
     </script>
 </body>
 </html>
