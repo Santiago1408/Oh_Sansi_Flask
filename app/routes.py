@@ -505,7 +505,7 @@ def generar_reporte_pdf():
     cursor = mysql.connection.cursor()
 
     sql = """
-        SELECT nombre, apellido, ci, colegio, curso, departamento, provincia, email, telefono
+        SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono
         FROM competidor
         WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', '')) 
           AND estado = 'registrado'
@@ -525,7 +525,7 @@ def generar_reporte_pdf():
     elements.append(Spacer(1, 12))
 
     table_data = [[
-        'Nombre', 'Apellido', 'CI', 'Colegio', 'Curso',
+        'Nombre', 'Apellido', 'CI', 'Colegio',
         'Departamento', 'Provincia', 'Email', 'Teléfono'
     ]]
 
@@ -538,7 +538,6 @@ def generar_reporte_pdf():
                 str(row['apellido']) if row['apellido'] is not None else '',
                 str(row['ci']) if row['ci'] is not None else '',
                 str(row['colegio']) if row['colegio'] is not None else '',
-                str(row['curso']) if row['curso'] is not None else '',
                 str(row['departamento']) if row['departamento'] is not None else '',
                 str(row['provincia']) if row['provincia'] is not None else '',
                 str(row['email']) if row['email'] is not None else '',
@@ -550,12 +549,12 @@ def generar_reporte_pdf():
 
     table = Table(table_data, repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
         ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
     ]))
 
     elements.append(table)
