@@ -295,7 +295,11 @@ def registrarse():
             telefono = request.form.get('numCelular').strip()
             rol = request.form.get('rol').strip()
             contrasena = request.form.get('password').strip()
-
+            
+            # Capturar el área si el rol es tutor
+            area = None
+            if rol == 'tutor':
+                area = request.form.get('area').strip()
 
             cursor = mysql.connection.cursor()
 
@@ -325,9 +329,9 @@ def registrarse():
                 new_id_tutor = max_id_tutor + 1
 
                 tipo_tutor = "profesor"  
-                query_tutor = "INSERT INTO tutor (id_tutor, id_usuario, tipo_tutor) VALUES (%s, %s, %s)"
-                cursor.execute(query_tutor, (new_id_tutor,
-                               new_id_usuario, tipo_tutor))
+                # Modificar la consulta para incluir el área
+                query_tutor = "INSERT INTO tutor (id_tutor, id_usuario, tipo_tutor, area) VALUES (%s, %s, %s, %s)"
+                cursor.execute(query_tutor, (new_id_tutor, new_id_usuario, tipo_tutor, area))
 
             elif rol == 'administrador':
                 cursor.execute(

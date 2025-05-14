@@ -59,6 +59,24 @@
                     <option value="cajero">Cajero</option>
                 </select>
                 <span id="rol-error" class="error-message"></span>
+                
+                <!-- Nuevo campo de Área (visible solo para tutores) -->
+                <div id="area-container" style="display: none;">
+                    <p>Área:</p>
+                    <p class="mensaje-area">Por favor seleccione un área de especialización</p>
+                    <select name="area" id="area">
+                        <option value="" disabled selected>Seleccione un área</option>
+                        <option value="matematica">Matemática</option>
+                        <option value="biologia">Biología</option>
+                        <option value="fisica">Física</option>
+                        <option value="quimica">Química</option>
+                        <option value="astronomia">Astronomía y Astrofísica</option>
+                        <option value="informatica">Informática</option>
+                        <option value="robotica">Robótica</option>
+                    </select>
+                    <span id="area-error" class="error-message"></span>
+                </div>
+                
                 <p>Contraseña:</p>
                 <input type="password" name="password" id="password" required>
                 <span id="password-error" class="error-message"></span>
@@ -152,6 +170,18 @@
         } else {
             document.getElementById('rol-error').style.display = 'none';
         }
+        
+        // Validación para el campo de Área (solo si el rol es tutor)
+        if (rol === 'tutor') {
+            const area = document.getElementById('area').value;
+            if (!['matematica', 'biologia', 'fisica', 'quimica', 'astronomia', 'informatica', 'robotica'].includes(area)) {
+                document.getElementById('area-error').textContent = 'Seleccione un área válida.';
+                document.getElementById('area-error').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('area-error').style.display = 'none';
+            }
+        }
 
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm_password').value;
@@ -175,6 +205,20 @@
 
         if (!valid) {
             event.preventDefault();
+        }
+    });
+    
+    // Script para mostrar/ocultar el campo de área según el rol seleccionado
+    document.getElementById('rol').addEventListener('change', function() {
+        const areaContainer = document.getElementById('area-container');
+        const areaSelect = document.getElementById('area');
+        
+        if (this.value === 'tutor') {
+            areaContainer.style.display = 'block';
+            areaSelect.setAttribute('required', '');
+        } else {
+            areaContainer.style.display = 'none';
+            areaSelect.removeAttribute('required');
         }
     });
 </script>
