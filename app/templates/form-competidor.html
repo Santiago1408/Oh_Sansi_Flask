@@ -95,7 +95,41 @@
     let todosTutores = [];
     let todasCompetencias = [];
 
-    // Función para cargar los tutores desde la API
+    // Función para cargar los tutores por área
+    function cargarTutoresPorArea(area) {
+        fetch(`/obtener_tutores_por_area/${encodeURIComponent(area)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener tutores por área');
+                }
+                return response.json();
+            })
+            .then(tutores => {
+                const selectorTutores = document.getElementById('tutor');
+                
+                // Limpiar opciones existentes excepto la primera
+                while (selectorTutores.options.length > 1) {
+                    selectorTutores.remove(1);
+                }
+                
+                // Agregar cada tutor como una opción
+                tutores.forEach(tutor => {
+                    const option = document.createElement('option');
+                    option.value = tutor.id_tutor;
+                    option.textContent = `${tutor.nombre} ${tutor.apellido}`;
+                    selectorTutores.appendChild(option);
+                });
+
+                // Limpiar campos de información
+                limpiarInfoTutor();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('No se pudieron cargar los tutores. Por favor, intente de nuevo más tarde.');
+            });
+    }
+
+    // Función para cargar todos los tutores como respaldo
     function cargarTutores() {
         fetch('/obtener_tutores_completos')
             .then(response => {
@@ -179,6 +213,15 @@
         while (selectorCategorias.options.length > 1) {
             selectorCategorias.remove(1);
         }
+        
+        // Limpiar el selector de tutores
+        const selectorTutores = document.getElementById('tutor');
+        while (selectorTutores.options.length > 1) {
+            selectorTutores.remove(1);
+        }
+        
+        // Limpiar la información del tutor
+        limpiarInfoTutor();
     }
 
     // Función para actualizar las categorías disponibles según el área y curso seleccionados
@@ -207,6 +250,11 @@
             option.textContent = categoria;
             selectorCategorias.appendChild(option);
         });
+        
+        // Cargar los tutores del área seleccionada
+        if (areaSeleccionada) {
+            cargarTutoresPorArea(areaSeleccionada);
+        }
     }
 
     // Función para mostrar la información del tutor seleccionado
