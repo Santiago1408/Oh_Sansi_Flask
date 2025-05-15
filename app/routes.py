@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import traceback
 from app import app, mysql
 from flask import render_template, jsonify, request, redirect, url_for, session, flash
@@ -37,6 +37,12 @@ def cajero_required(f):
         if 'user_id' not in session or session['rol'] != 'cajero':
             flash('No tienes permisos para acceder a esta página', 'error')
             return redirect(url_for('home'))
+        
+        permitido, mensaje, _, _ = verificar_periodo('pagos')
+        if not permitido:
+            flash(mensaje, 'warning')
+            return redirect(url_for('home'))
+            
         return f(*args, **kwargs)
     return decorated_function
 
@@ -57,6 +63,44 @@ def competidor_required(f):
             return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
+
+def verificar_periodo(tipo_periodo):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT fecha_inicio, fecha_fin FROM periodos_competencia WHERE tipo_periodo = %s", (tipo_periodo,))
+        periodo = cursor.fetchone()
+        cursor.close()
+        
+        if not periodo or not periodo['fecha_inicio'] or not periodo['fecha_fin']:
+            return (False, f"No hay período de {tipo_periodo} configurado", None, None)
+        
+        hoy = datetime.now().date()
+        inicio = periodo['fecha_inicio']
+        fin = periodo['fecha_fin']
+        
+        if hoy < inicio:
+            return (False, f"El período de {tipo_periodo} comenzará el {inicio.strftime('%d/%m/%Y')}",inicio, fin)
+        elif hoy > fin:
+            return (False, f"El período de {tipo_periodo} finalizó el {fin.strftime('%d/%m/%Y')}", inicio, fin)
+        else:
+            return (True, f"Estamos en período de {tipo_periodo}", inicio, fin)
+            
+    except Exception as e:
+        print(f"Error al verificar periodo: {str(e)}")
+        return (True, "Error al verificar período",None,None)
+
+# Decorador para restringir por periodo
+def periodo_requerido(tipo_periodo):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            permitido, mensaje, inicio, fin = verificar_periodo(tipo_periodo)
+            if not permitido and "fuera de periodo" in mensaje:
+                flash(mensaje, 'warning')
+                return redirect(url_for('home'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 @app.route('/')
 def home():
@@ -83,6 +127,7 @@ def cajero():
 
 @app.route('/confirmar-pago', methods=['POST'])
 @cajero_required
+@periodo_requerido('pagos')
 def confirmar_pago():
     try:
         id_competidor = request.form['id_competidor']
@@ -99,9 +144,12 @@ def confirmar_pago():
     
     return redirect(url_for('cajero'))
 
+
 @app.route('/tutor')
 @tutor_required
 def tutor():
+    permitido, mensaje, _, _ = verificar_periodo('validacion')
+
     # Obtener el ID del tutor de la sesión
     tutor_id = session.get('tutor_id')
     cursor = mysql.connection.cursor()
@@ -111,11 +159,18 @@ def tutor():
     data = cursor.fetchall() 
     cursor.execute(sql2, (tutor_id,))
     data2 = cursor.fetchall()   
-    return render_template('tutor.html', data=data, data2=data2)
+    return render_template('tutor.html', data=data, data2=data2, periodo_activo=permitido, mensaje_periodo=mensaje)
 
 @app.route('/validar-competidor', methods=['POST'])
 @tutor_required
+@periodo_requerido('validacion')
 def validar_competidor():
+    # Verificar primero si estamos en período de validación
+    permitido, mensaje, _, _ = verificar_periodo('validacion')
+    if not permitido:
+        flash(mensaje, 'warning')
+        return redirect(url_for('tutor'))
+
     try:
         id_competidor = request.form['id_competidor']
         print("ID Competidor:", id_competidor)
@@ -141,13 +196,26 @@ def adminreportes():
     num_competidores = len(data)
     return render_template('admin-reportes.html', num_competidores=num_competidores)
 
-@app.route('/admin-competencia')
-@admin_required
-def admincompetencia():
-    return render_template('admin-competencia.html')
+#@app.route('/admin-competencia')
+#@admin_required
+#def admincompetencia():
+#    return render_template('admin-competencia.html')
 
 @app.route('/inscribirse')
+@periodo_requerido('inscripcion')
 def inscribirse():
+    
+    render_template('form-competidor.html')
+    permitido, mensaje, inicio, fin = verificar_periodo('inscripcion')
+    if not permitido:
+        flash(mensaje, 'warning')
+        return redirect(url_for('home'))
+    
+    en_competencia, msg_comp, _, _ = verificar_periodo('competencia')
+    if en_competencia and "En período" in msg_comp:
+        flash('No se puede inscribir durante la competencia', 'danger')
+        return redirect(url_for('home'))
+    
     return render_template('form-competidor.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -197,6 +265,12 @@ def login():
             cajero = cursor.fetchone()
             if cajero:
                 session['cajero_id'] = cajero['id_cajero']
+                # Verificar período de pagos al iniciar sesión
+            permitido, mensaje, _, _ = verificar_periodo('pagos')
+            if not permitido:
+                flash(mensaje, 'warning')
+                return redirect(url_for('home'))
+            
             return redirect(url_for('cajero'))
             
         elif user['rol'] == 'tutor':
@@ -214,7 +288,6 @@ def login():
             if competidor:
                 session['competidor_id'] = competidor['id_competidor']
             return redirect(url_for('inscripcion'))
-        
         
         # Si no se identifica el rol específico
         flash('Tipo de usuario no identificado', 'error')
@@ -352,15 +425,15 @@ def registrar_competidor():
         estado = 'pendiente'
         
         try:
-            print(id_tutor)
+            print("Datos recibidos:")
             cursor = mysql.connection.cursor()
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado, id_tutor))
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -383,7 +456,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia['id_competencia']
+                id_competencia = competencia[0]
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -394,7 +467,7 @@ def registrar_competidor():
             
             # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
             insert_puede_tener = """
-            INSERT INTO puede_tener (id_tutor, id_competidor)
+            INSERT INTO `Puede tener` (id_tutor, id_competidor)
             VALUES (%s, %s)
             """
             cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
@@ -495,6 +568,114 @@ def eliminar_competencia():
     cursor.close()
     flash('Competencia eliminada correctamente', 'success')
     return redirect(url_for('adminareas'))
+
+#esta funcion bloquea todas las demas mientras se esta en el periodo de competicion
+@app.before_request
+def verificar_fecha_sistema():
+    # Excluir rutas que deben estar disponibles siempre
+    excluded_routes = ['login', 'logout', 'home', 'static', 'admincompetencia']
+    if request.endpoint in excluded_routes:
+        return
+    
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT fecha_inicio, fecha_fin FROM periodos_competencia WHERE tipo_periodo = 'competencia'")
+        competencia = cursor.fetchone()
+        cursor.close()
+        
+        if competencia:
+            hoy_sistema = datetime.now().date()
+            inicio_competencia = competencia['fecha_inicio']
+            fin_competencia = competencia['fecha_fin']
+            
+            if inicio_competencia <= hoy_sistema <= fin_competencia:
+                flash('El sistema está en período de competencia. Acciones restringidas.', 'danger')
+                return redirect(url_for('home'))
+    except Exception as e:
+        print(f"Error al verificar fecha del sistema: {str(e)}")
+
+
+
+# Ruta para mostrar el formulario con las fechas actuales
+@app.route('/admin-competencia', methods=['GET', 'POST'])
+@admin_required
+def admincompetencia():
+    # Obtener fechas actuales para mostrar en el formulario
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM periodos_competencia")
+    periodos = cursor.fetchall()
+    
+    # Inicializar fechas con valores vacíos
+    fechas = {
+        'inscripcion': {'inicio': '', 'fin': ''},
+        'validacion': {'inicio': '', 'fin': ''},
+        'pagos': {'inicio': '', 'fin': ''},
+        'competencia': {'inicio': '', 'fin': ''}
+    }
+    
+    # Llenar con los valores de la BD si existen
+    for p in periodos:
+        if p['fecha_inicio']:
+            # Convertir a formato YYYY-MM-DD (formato que usa input type="date")
+            fecha_inicio = p['fecha_inicio'].strftime('%Y-%m-%d') if isinstance(p['fecha_inicio'], (date, datetime)) else ''
+            fechas[p['tipo_periodo']]['inicio'] = fecha_inicio
+        
+        if p['fecha_fin']:
+            # Convertir a formato YYYY-MM-DD
+            fecha_fin = p['fecha_fin'].strftime('%Y-%m-%d') if isinstance(p['fecha_fin'], (date, datetime)) else ''
+            fechas[p['tipo_periodo']]['fin'] = fecha_fin
+
+    if request.method == 'POST':
+        try:
+            periodos_form = {
+                'inscripcion': {'inicio': 'fechaIniIns', 'fin': 'fechaFinIns'},
+                'validacion': {'inicio': 'fechaIniVal', 'fin': 'fechaFinVal'},
+                'pagos': {'inicio': 'fechaIniPag', 'fin': 'fechaFinPag'},
+                'competencia': {'inicio': 'fechaIniComp', 'fin': 'fechaFinComp'}
+            }
+            
+            for tipo, campos in periodos_form.items():
+                fecha_inicio_str = request.form.get(campos['inicio'])
+                fecha_fin_str = request.form.get(campos['fin'])
+                
+                if fecha_inicio_str and fecha_fin_str:
+                    try:
+                        # Convertir de YYYY-MM-DD (formato de input date) a objeto date
+                        fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+                        fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+                        
+                        if fecha_fin < fecha_inicio:
+                            flash(f'Error en {tipo}: La fecha fin no puede ser menor que la fecha inicio', 'danger')
+                            continue
+                            
+                        cursor.execute("""
+                            INSERT INTO periodos_competencia (tipo_periodo, fecha_inicio, fecha_fin)
+                            VALUES (%s, %s, %s)
+                            ON DUPLICATE KEY UPDATE
+                                fecha_inicio = VALUES(fecha_inicio),
+                                fecha_fin = VALUES(fecha_fin)
+                            """, 
+                            (tipo, fecha_inicio, fecha_fin))
+                            
+                        # Actualizar para mostrar en el form
+                        fechas[tipo]['inicio'] = fecha_inicio_str
+                        fechas[tipo]['fin'] = fecha_fin_str
+                        
+                    except ValueError:
+                        flash(f'Formato de fecha inválido para {tipo}', 'danger')
+            
+            mysql.connection.commit()
+            flash('Fechas actualizadas correctamente', 'success')
+            
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(f'Error al actualizar fechas: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+            return render_template('admin-competencia.html', fechas=fechas)
+    
+    cursor.close()
+    return render_template('admin-competencia.html', fechas=fechas)
 
 @app.route('/generar-reporte-pdf', methods=['POST'])
 @admin_required

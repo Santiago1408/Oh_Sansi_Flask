@@ -2,17 +2,28 @@
 {%block title%}Administrar Competencia{%endblock%}
 {%block content%}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-competencia.css') }}">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('admincompetencia') }}">
 <div class="contenido">
     <div class="bloque">
       <h2>PROCESO DE INSCRIPCIÓN</h2>
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniIns">
+          <input type="date" name="fechaIniIns" value="{{ fechas.inscripcion.inicio }}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinIns">
+          <input type="date" name="fechaFinIns" value="{{ fechas.inscripcion.fin }}">
         </div>
       </div>
     </div>
@@ -22,11 +33,11 @@
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniVal">
+          <input type="date" name="fechaIniVal" value="{{ fechas.validacion.inicio }}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinVal">
+          <input type="date" name="fechaFinVal" value="{{ fechas.validacion.fin }}">
         </div>
       </div>
     </div>
@@ -36,11 +47,11 @@
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniPag">
+          <input type="date" name="fechaIniPag" value="{{ fechas.pagos.inicio }}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinPag">
+          <input type="date" name="fechaFinPag" value="{{ fechas.pagos.fin }}">
         </div>
       </div>
     </div>
@@ -50,11 +61,11 @@
       <div class="fechas">
         <div>
           <label>Fecha Inicio:</label>
-          <input type="date" name="fechaIniComp">
+          <input type="date" name="fechaIniComp" value="{{ fechas.competencia.inicio }}">
         </div>
         <div>
           <label>Fecha Fin:</label>
-          <input type="date" name="fechaFinComp">
+          <input type="date" name="fechaFinComp" value="{{ fechas.competencia.fin }}">
         </div>
       </div>
     </div>
@@ -63,4 +74,5 @@
   <div class="contenedor-boton">
     <button class="boton" type="submit">Guardar</button>
   </div>
+  </form>
 {%endblock content%}
