@@ -32,4 +32,38 @@
     </div>
         <a href="{{url_for('inscribirse')}}" class="boton">Inscribir a un estudiate</a>
     </div>
+     
+  <div id="modalMotivo" class="modal-motivo">
+  <div class="modal-contenido">
+    <h3>Mensaje para el competidor rechazado</h3>
+    <form action="{{ url_for('rechazar_competidor') }}" method="POST">
+      <input type="hidden" name="id_competidor" id="id_competidor_modal">
+      <textarea name="motivo" rows="4" placeholder="Escriba el mensaje para el competidor..." required></textarea>
+      <div class="modal-botones">
+        <button type="submit">Enviar</button>
+        <button type="button" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("modalMotivo");
+  const idInput = document.getElementById("id_competidor_modal");
+
+  document.querySelectorAll('.btn-fail').forEach(btn => {
+    btn.addEventListener('click', function(event) {
+      event.preventDefault();
+      const input = this.parentElement.querySelector('input[name="id_competidor"]');
+      if (input) {
+        idInput.value = input.value;
+        modal.style.display = "flex";
+      }
+    });
+  });
+
+  function cerrarModal() {
+    modal.style.display = "none";
+  }
+</script>
 {% endblock %}

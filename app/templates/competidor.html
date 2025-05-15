@@ -48,7 +48,11 @@
     <div class="mensaje">
         <label for="msg">Mensajes para mí:</label>
         <div class="cuadro-mensaje">
-            
+             {% if competidor.estado == 'rechazado' and competidor.mensaje %}
+            <p style="margin: 10px;">{{ competidor.mensaje }}</p>
+             {% else %}
+            <p style="margin: 10px;">No tienes mensajes nuevos.</p>
+             {% endif %}
         </div>
     </div>
 

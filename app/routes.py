@@ -64,7 +64,7 @@ def competidor():
     
     # Obtener los datos del competidor
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id_competidor, nombre, apellido, estado FROM competidor WHERE id_competidor = %s", 
+    cursor.execute("SELECT id_competidor, nombre, mensaje, apellido, estado FROM competidor WHERE id_competidor = %s", 
                   [session['competidor_id']])
     competidor_data = cursor.fetchone()
     
@@ -82,9 +82,11 @@ def competidor():
     competencias = cursor.fetchall()
     cursor.close()
     
+    
     return render_template('competidor.html', 
                           competidor=competidor_data,
-                          competencias=competencias)
+                          competencias=competencias,
+                          )
 
 def competidor_required(f):
     @wraps(f)
@@ -776,3 +778,23 @@ def generar_reporte_pdf():
     response.headers['Content-Disposition'] = f'attachment; filename=Reporte_{grado.replace(" ", "_")}.pdf'
 
     return response
+
+# Funcion del motivo por el cual fue rechazado el tutor
+@app.route('/rechazar_competidor', methods=['POST'])
+@tutor_required
+def rechazar_competidor():
+    try:
+        id_competidor = request.form['id_competidor']
+        mensaje = request.form['motivo']  
+
+        cursor = mysql.connection.cursor()
+        sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
+        cursor.execute(sql, (mensaje, id_competidor))
+        mysql.connection.commit()
+
+        flash('Competidor rechazado con mensaje registrado', 'info')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al rechazar el competidor: {str(e)}', 'danger')
+    
+    return redirect(url_for('tutor'))
