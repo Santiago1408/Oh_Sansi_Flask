@@ -11,6 +11,7 @@
         <span class="curso">{{ competencia.grado }}</span>
         <span class="area">- {{ competencia.area }}</span>
         <span class="categoria">- {{ competencia.categoria }}</span>
+        <span class="costo">- Bs. {{competencia.costo}}</span>
       </div>
       <form action="{{ url_for('eliminar_competencia') }}" method="POST">
         <input type="hidden" name="id" value="{{ competencia.id_competencia }}">
