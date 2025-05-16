@@ -785,3 +785,40 @@ def rechazar_competidor():
         flash(f'Error al rechazar el competidor: {str(e)}', 'danger')
     
     return redirect(url_for('tutor'))
+
+@app.route('/obtener_tutores_por_area/<string:area>')
+def obtener_tutores_por_area(area):
+    try:
+        # Crear un cursor para ejecutar consultas SQL
+        cursor = mysql.connection.cursor()
+        
+        # Consulta SQL para obtener los tutores que pertenecen a un área específica
+        cursor.execute("""
+            SELECT u.id_usuario, t.id_tutor, u.nombre, u.apellido, u.email, u.telefono 
+            FROM Usuario u
+            INNER JOIN tutor t ON u.id_usuario = t.id_usuario
+            WHERE u.rol = 'tutor' AND t.area = %s
+        """, [area])
+        
+        # Obtener los resultados
+        tutores_raw = cursor.fetchall()
+        
+        # Convertir los resultados a una lista de diccionarios
+        tutores = []
+        for tutor in tutores_raw:
+            tutores.append({
+                'id_usuario': tutor['id_usuario'],
+                'id_tutor': tutor['id_tutor'],
+                'nombre': tutor['nombre'],
+                'apellido': tutor['apellido'],
+                'email': tutor['email'],
+                'telefono': tutor['telefono']
+            })
+        
+        # Cerrar el cursor
+        cursor.close()
+        
+        return jsonify(tutores)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
