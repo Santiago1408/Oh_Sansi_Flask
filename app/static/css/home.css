@@ -105,3 +105,10 @@ nav a:hover{
     color: white;
     transition: 0.3s;
 }
+
+.info-olimpiada{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px 100px;
+}

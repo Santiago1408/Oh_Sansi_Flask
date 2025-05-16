@@ -137,7 +137,11 @@ def periodo_requerido(tipo_periodo):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    cursor = mysql.connection.cursor()
+    sql = "SELECT * FROM periodos_competencia"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('home.html', data=data)
 
 @app.route('/admin-areas')
 @admin_required
@@ -337,58 +341,41 @@ def logout():
 def registrarse():
     if request.method == 'POST':
         try:
-            nombres = request.form.get('nombres').strip()
-            apellidos = request.form.get('apellidos').strip()
-            fecha_nacimiento = request.form.get('fechaNacimiento')
-            ci = request.form.get('ci').strip()
-            email = request.form.get('email').strip()
-            telefono = request.form.get('numCelular').strip()
-            rol = request.form.get('rol').strip()
-            contrasena = request.form.get('password').strip()
-
+            nombres = request.form.get('nombres', '').strip()
+            apellidos = request.form.get('apellidos', '').strip()
+            fecha_nacimiento = request.form.get('fechaNacimiento', '').strip()
+            ci = request.form.get('ci', '').strip()
+            email = request.form.get('email', '').strip()
+            telefono = request.form.get('numCelular', '').strip()
+            rol = request.form.get('rol', '').strip()
+            contrasena = request.form.get('password', '').strip()
 
             cursor = mysql.connection.cursor()
 
-            cursor.execute("SELECT MAX(id_usuario) FROM usuario")
-            max_id_usuario = cursor.fetchone()['MAX(id_usuario)'] or 0
-            new_id_usuario = max_id_usuario + 1
-
             query_usuario = """
-                INSERT INTO usuario (id_usuario, nombre, apellido, email, telefono, contrasenia, rol)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO usuario (nombre, apellido, email, telefono, contrasenia, rol)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(query_usuario, (new_id_usuario, nombres,
-                           apellidos, email, telefono, contrasena, rol))
-            mysql.connection.commit()
+            cursor.execute(query_usuario, (nombres, apellidos, email, telefono, contrasena, rol))
+            usuario_id = cursor.lastrowid
 
             if rol == 'cajero':
-                cursor.execute("SELECT MAX(id_cajero) FROM cajero")
-                max_id_cajero = cursor.fetchone()['MAX(id_cajero)'] or 0
-                new_id_cajero = max_id_cajero + 1
-
-                query_cajero = "INSERT INTO cajero (id_cajero, id_usuario) VALUES (%s, %s)"
-                cursor.execute(query_cajero, (new_id_cajero, new_id_usuario))
+                query_cajero = "INSERT INTO cajero (id_usuario) VALUES (%s)"
+                cursor.execute(query_cajero, (usuario_id,))
 
             elif rol == 'tutor':
-                cursor.execute("SELECT MAX(id_tutor) FROM tutor")
-                max_id_tutor = cursor.fetchone()['MAX(id_tutor)'] or 0
-                new_id_tutor = max_id_tutor + 1
+                tipo_tutor = request.form.get('tipoTutor', '').strip()
+                area = request.form.get('area', '').strip()
 
-                tipo_tutor = "profesor"  
-                query_tutor = "INSERT INTO tutor (id_tutor, id_usuario, tipo_tutor) VALUES (%s, %s, %s)"
-                cursor.execute(query_tutor, (new_id_tutor,
-                               new_id_usuario, tipo_tutor))
+                if not tipo_tutor or not area:
+                    raise ValueError('Faltan datos de tutor: tipo_tutor o área.')
+
+                query_tutor = "INSERT INTO tutor (id_usuario, tipo_tutor, area) VALUES (%s, %s, %s)"
+                cursor.execute(query_tutor, (usuario_id, tipo_tutor, area))
 
             elif rol == 'administrador':
-                cursor.execute(
-                    "SELECT MAX(id_administrador) FROM administrador")
-                max_id_administrador = cursor.fetchone()[
-                    'MAX(id_administrador)'] or 0
-                new_id_administrador = max_id_administrador + 1
-
-                query_administrador = "INSERT INTO administrador (id_administrador, id_usuario) VALUES (%s, %s)"
-                cursor.execute(query_administrador,
-                               (new_id_administrador, new_id_usuario))
+                query_administrador = "INSERT INTO administrador (id_usuario) VALUES (%s)"
+                cursor.execute(query_administrador, (usuario_id,))
 
             mysql.connection.commit()
             cursor.close()
@@ -398,11 +385,11 @@ def registrarse():
 
         except Exception as e:
             mysql.connection.rollback()
-            flash(
-                f'Ocurrió un error al registrar el usuario: {str(e)}', 'danger')
+            flash(f'Ocurrió un error al registrar el usuario: {str(e)}', 'danger')
             return redirect(url_for('registrarse'))
 
     return render_template('registro.html')
+
 
 # Ruta para obtener las competencias disponibles
 @app.route('/obtener_competencias')
