@@ -564,10 +564,11 @@ def registrar_area():
     data['curso'] = request.form['curso']
     data['area'] = request.form['area']
     data['categoria'] = request.form['categoria']
+    data['costo'] = request.form['costo']
 
     cursor = mysql.connection.cursor()
-    sql = "INSERT INTO competencia (area, categoria, grado) VALUES (%s, %s, %s)" 
-    cursor.execute(sql, (data['area'], data['categoria'], data['curso']))
+    sql = "INSERT INTO competencia (area, categoria, grado, costo) VALUES (%s, %s, %s, %s)" 
+    cursor.execute(sql, (data['area'], data['categoria'], data['curso'], data['costo']))
     mysql.connection.commit()
     cursor.close()
     flash('Área registrada correctamente', 'success')

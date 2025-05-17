@@ -2,30 +2,30 @@
 {%block title%}Inicio{%endblock title%}
 {%block content%}
 <main>
-  <div class="bienvenida">
-      <div class="info">
-          <h2>Olimpiadas en Ciencias y Tecnología San Simón</h2>
-          <h3>La facultad de Ciencias y Tecnología de la Universidad Mayor de San Simón convoca a los estudiantes
-              del Sistema de Educación Regular a participar en las olimpiadas Oh! Sansi
-          </h3>
-          <p>
-              Matemáticas, Física, Química, Biología, Astronomía y Astrofísica, Informática, Robótica
-          </p>
-          <input type="button" id="insc" value="Inscribirse" onclick="location.href='{{ url_for('inscribirse') }}'">
-      </div>
-      <div class="mascota">
-          <img src="{{url_for('static', filename='images/robot-sansi.png')}}" alt="Hola Sansi">
-      </div>
-  </div>
-  <div class="info-olimpiadas">
-      <h2>¿Qué son las Olimpiadas en Ciencias y Tecnología?</h2>
-      <p>
-          Las Olimpiadas en Ciencias y Tecnología son un evento académico que busca fomentar el interés por las
-          ciencias y la tecnología entre los estudiantes de educación regular. A través de una serie de
-          competencias, los participantes tendrán la oportunidad de demostrar sus habilidades y conocimientos en
-          diversas áreas científicas.
-      </p>
-    <p>
+    <div class="bienvenida">
+        <div class="info">
+            <h2>Olimpiadas en Ciencias y Tecnología San Simón</h2>
+            <h3>La facultad de Ciencias y Tecnología de la Universidad Mayor de San Simón convoca a los estudiantes
+                del Sistema de Educación Regular a participar en las olimpiadas Oh! Sansi
+            </h3>
+            <p>
+                Matemáticas, Física, Química, Biología, Astronomía y Astrofísica, Informática, Robótica
+            </p>
+            <input type="button" id="insc" value="Inscribirse" onclick="location.href='{{ url_for('inscribirse') }}'">
+        </div>
+        <div class="mascota">
+            <img src="{{url_for('static', filename='images/robot-sansi.png')}}" alt="Hola Sansi">
+        </div>
+    </div>
+    <div class="info-olimpiadas">
+        <h2>¿Qué son las Olimpiadas en Ciencias y Tecnología?</h2>
+        <p>
+            Las Olimpiadas en Ciencias y Tecnología son un evento académico que busca fomentar el interés por las
+            ciencias y la tecnología entre los estudiantes de educación regular. A través de una serie de
+            competencias, los participantes tendrán la oportunidad de demostrar sus habilidades y conocimientos en
+            diversas áreas científicas.
+        </p>
+        <p>
             Este evento no solo promueve el aprendizaje y la investigación, sino que también busca incentivar la
             creatividad y el trabajo en equipo entre los estudiantes. Las Olimpiadas en Ciencias y Tecnología son
             una excelente oportunidad para que los jóvenes se involucren en el mundo de la ciencia y la tecnología,
@@ -34,4 +34,3 @@
     </div>
 </main>
 {%endblock%}
-

@@ -106,9 +106,9 @@ nav a:hover{
     transition: 0.3s;
 }
 
-.info-olimpiada{
-    display: flex;
+.info-olimpiadas{
     justify-content: center;
     align-items: center;
-    margin: 50px 100px;
+    margin: 50px 600px 100px 50px;
+    background-color: aliceblue;
 }
