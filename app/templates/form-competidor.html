@@ -12,7 +12,8 @@
             <p>Apellidos: </p>
             <input type="text" name="apellido" id="">
             <p>Fecha de nacimeinto: </p>
-            <input type="date" name="fecha_nacimiento" id="">
+            <input type="date" name="fecha_nacimiento" id="fechaNacimiento">
+            <span id="errorEdad" style="color: red; font-size: 0.9em; display:block;"></span>
             <p>Carnet de identidad:</p>
             <input type="text" name="ci" id="">
             <p>Correo electrónico: </p>
@@ -306,5 +307,36 @@
             actualizarCategoriasPorArea();
         });
     });
+
+        // Validación de edad antes de enviar el formulario
+    document.querySelector('form.campos').addEventListener('submit', function(event) {
+        const fechaNacimientoInput = document.getElementById('fechaNacimiento');
+        const errorEdadSpan = document.getElementById('errorEdad');
+        const fechaNacimiento = new Date(fechaNacimientoInput.value);
+        const hoy = new Date();
+
+        // Limpiar mensaje anterior
+        errorEdadSpan.textContent = '';
+
+        if (isNaN(fechaNacimiento)) {
+            errorEdadSpan.textContent = 'Por favor, ingrese una fecha válida.';
+            event.preventDefault();
+            return;
+        }
+
+        let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+        const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+        const dia = hoy.getDate() - fechaNacimiento.getDate();
+
+        if (mes < 0 || (mes === 0 && dia < 0)) {
+            edad--;
+        }
+
+        if (edad < 8 || edad > 18) {
+            errorEdadSpan.textContent = 'La edad del competidor debe estar entre 8 y 18 años.';
+            event.preventDefault(); // Evita que el formulario se envíe
+        }
+    });
+
 </script>
 {%endblock%}
