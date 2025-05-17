@@ -1,20 +1,42 @@
+
 {% extends './menu-home.html' %}
 {% block title %}Cajero{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cajero.css') }}">
 <main>
-    <div class="items">
-        <h3 id="tituloLista">Estudiantes:</h3>
-        {% for estudiante in data %}
-        <form action="{{url_for('confirmar_pago')}}" method="POST" class="formulario">
-            <p class="estudiante">{{estudiante.nombre}}  {{estudiante.apellido}}</p>
-            <input type="hidden" name="id_competidor" value="{{estudiante.id_competidor}}">
-            <button type="submit"> <i class="bi bi-check-circle" id="ok"></i></button>
-        </form>
-
-        {% endfor %}
+    <div class="container-cajero">
+        <div class="header-cajero">
+            <h2 id="tituloLista">Gestión de Pagos</h2>
+            <img src="{{url_for('static', filename='images/cubos.png')}}" alt="Logo" id="imagen">
+        </div>
+        
+        <div class="items">
+            <div class="seccion-info">
+                <h3>Lista de Estudiantes</h3>
+                <p class="descripcion">Seleccione un estudiante para procesar su pago</p>
+            </div>
+            
+            <div class="lista-estudiantes">
+                {% for estudiante in data %}
+                <div class="tarjeta-estudiante">
+                    <form action="{{url_for('confirmar_pago')}}" method="POST" class="formulario">
+                        <div class="info-estudiante">
+                            <p class="estudiante">{{estudiante.nombre}} {{estudiante.apellido}}</p>
+                            <div class="precio-container">
+                                <span class="etiqueta-precio">Precio:</span>
+                                <span class="valor-precio">$00.00</span> <!-- Aquí se mostrará el precio desde la base de datos -->
+                            </div>
+                        </div>
+                        <input type="hidden" name="id_competidor" value="{{estudiante.id_competidor}}">
+                        <button type="submit" class="boton-pago" title="Confirmar pago">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <img src="{{url_for('static', filename='images/cubos.png')}}" alt="" srcset="" id="imagen">
 </main>
-{% endblock%}
+{% endblock %}
