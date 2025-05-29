@@ -157,9 +157,10 @@ def adminareas():
 @cajero_required
 def cajero():
     cursor = mysql.connection.cursor()
-    sql = "SELECT * FROM competidor WHERE estado = 'validado'"
+    sql = "SELECT * FROM competidor, compite, competencia WHERE estado = 'validado' and competidor.id_competidor = compite.id_competidor and competencia.id_competencia = compite.id_competencia"
     cursor.execute(sql)
     data = cursor.fetchall()
+    
     return render_template('cajero.html', data=data)
 
 @app.route('/confirmar-pago', methods=['POST'])
@@ -426,32 +427,40 @@ def obtener_competencias():
 @app.route('/registrar_competidor', methods=['POST'])
 def registrar_competidor():
     if request.method == 'POST':
-        # Obtener los datos del formulario
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-        fecha_nacimiento = request.form['fecha_nacimiento']
-        ci = request.form['ci']
-        email = request.form['email']
-        telefono = request.form['telefono']
-        colegio = request.form['colegio']
-        curso = request.form['curso']
-        departamento = request.form['departamento']
-        provincia = request.form['provincia']
-        area = request.form['area']
-        categoria = request.form['categoria']
-        id_tutor = request.form['id_tutor']
-        estado = 'pendiente'
-        
         try:
-            print("Datos recibidos:")
+            # Obtener los datos del formulario
+            nombre = request.form.get('nombre', '').strip()
+            apellido = request.form.get('apellido', '').strip()
+            fecha_nacimiento = request.form.get('fecha_nacimiento', '').strip()
+            ci = request.form.get('ci', '').strip()
+            email = request.form.get('email', '').strip()
+            telefono = request.form.get('telefono', '').strip()
+            colegio = request.form.get('colegio', '').strip()
+            curso = request.form.get('curso', '').strip()
+            departamento = request.form.get('departamento', '').strip()
+            provincia = request.form.get('provincia', '').strip()
+            area = request.form.get('area', '').strip()
+            categoria = request.form.get('categoria', '').strip()
+            id_tutor = request.form.get('id_tutor', '').strip()
+            estado = 'pendiente'
+            mensaje = ''
+            
+            # Validar datos importantes
+            if not nombre or not apellido or not ci or not email or not id_tutor:
+                flash('Faltan datos obligatorios. Por favor completa todos los campos requeridos.', 'danger')
+                return redirect(url_for('inscribirse'))
+            
+            print(f"Datos recibidos: {nombre}, {apellido}, {fecha_nacimiento}, {curso}, {area}, {categoria}, {id_tutor}")
             cursor = mysql.connection.cursor()
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
-            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
+                                  nombre, apellido, email, telefono, estado, id_tutor, mensaje)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, nombre, apellido, email, telefono, estado))
+            cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
+                                             nombre, apellido, email, telefono, estado, id_tutor, mensaje))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -474,7 +483,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia[0]
+                id_competencia = competencia['id_competencia']  # Acceder como diccionario
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -482,26 +491,40 @@ def registrar_competidor():
                 VALUES (%s, %s)
                 """
                 cursor.execute(insert_compite, (id_competencia, id_competidor))
+                print(f"Competidor asociado a competencia ID: {id_competencia}")
+            else:
+                print(f"No se encontró competencia con: área={area}, categoría={categoria}, grado={curso}")
+                # Hacer rollback si no se encuentra la competencia
+                mysql.connection.rollback()
+                flash('No se encontró la competencia seleccionada. Por favor verifica los datos.', 'danger')
+                return redirect(url_for('inscribirse'))
             
             # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
+            # Comentando esta parte porque puede que esta tabla no sea necesaria si ya tienes id_tutor en la tabla competidor
+            # o si ya tienes la tabla inscripción que relaciona ambos
+            """
             insert_puede_tener = """
-            INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            """INSERT INTO `Puede tener` (id_tutor, id_competidor)
             VALUES (%s, %s)
             """
+            """
             cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
+            """
             
             # Confirmar los cambios en la base de datos
             mysql.connection.commit()
-            
             cursor.close()
             
+            flash('¡Inscripción realizada con éxito! Tu registro está pendiente de validación por el tutor.', 'success')
             # Redirigir a una página de éxito o a la página principal
             return redirect(url_for('home'))
         
         except Exception as e:
-            # En caso de error, devolver un mensaje o redirigir a una página de error
-            print('error en el registro:', e)
-            return str(e)
+            # En caso de error, hacer rollback y mostrar mensaje de error
+            mysql.connection.rollback()
+            print(f'Error en el registro: {str(e)}')
+            flash(f'Error al registrar competidor: {str(e)}', 'danger')
+            return redirect(url_for('inscribirse'))
     
     # Si la solicitud no es POST, redirigir a la página principal
     return redirect(url_for('home'))

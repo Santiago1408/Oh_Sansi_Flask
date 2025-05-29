@@ -24,8 +24,8 @@
                         <div class="info-estudiante">
                             <p class="estudiante">{{estudiante.nombre}} {{estudiante.apellido}}</p>
                             <div class="precio-container">
-                                <span class="etiqueta-precio">Precio:</span>
-                                <span class="valor-precio">$00.00</span> <!-- Aquí se mostrará el precio desde la base de datos -->
+                                <span class="etiqueta-precio">Costo de la inscripción:</span>
+                                <span class="valor-precio">BS. {{estudiante.costo}}</span> 
                             </div>
                         </div>
                         <input type="hidden" name="id_competidor" value="{{estudiante.id_competidor}}">
