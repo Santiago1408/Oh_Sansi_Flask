@@ -113,7 +113,7 @@ nav a:hover{
 }
 
 .atomo{
-    width: 20%;
+    width: 30%;
 }
 
 .atomo img{
@@ -122,16 +122,18 @@ nav a:hover{
 }
 
 .desc{
-    width: 80%;
+    font-size: 20px;
+    width: 70%;
     padding: 20px;
     text-align: justify;
 }
 
 .dates{
+    width: 90%;
     margin: 20px auto;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
 }
 
 .card{
@@ -146,7 +148,7 @@ nav a:hover{
     color: #212756;
     margin: 0;
     margin-top: 20px;
-    font-size: 35px;
+    font-size: 25px;
 }
 
 .card p{
@@ -159,7 +161,7 @@ nav a:hover{
     margin: 50px auto;
 }
 
-.fechas-importantes h2{
+#tit-fechas{
     color: #212756;
     font-size: 30px;
 }

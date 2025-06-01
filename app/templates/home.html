@@ -38,12 +38,11 @@
         </div>
     </div>
     <div class="fechas-importantes">
-        <h2>Fechas importantes</h2>
+        <h2 id="tit-fechas">Fechas importantes</h2>
         <div class="dates">
             {% for periodo in periodos %}
             <div class="card">
-                <h2>{{ periodo.fecha_inicio_formateada|capitalize }} - {{ periodo.fecha_fin_formateada|lower }}</h2>
-                <p>
+                <h2>
                     {% if periodo.tipo_periodo == 'inscripcion' %}
                     Proceso de inscripción
                     {% elif periodo.tipo_periodo == 'validacion' %}
@@ -55,7 +54,8 @@
                     {% else %}
                     {{ periodo.tipo_periodo|capitalize }}
                     {% endif %}
-                </p>
+                </h2>
+                <p>Del {{ periodo.fecha_inicio_formateada|capitalize }} al {{ periodo.fecha_fin_formateada|lower }}</p>
             </div>
             {% endfor %}
         </div>
