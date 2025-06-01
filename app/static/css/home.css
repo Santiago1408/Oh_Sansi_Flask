@@ -128,8 +128,7 @@ nav a:hover{
 }
 
 .dates{
-    width: 80%;
-    margin: 50px auto;
+    margin: 20px auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
@@ -164,3 +163,4 @@ nav a:hover{
     color: #212756;
     font-size: 30px;
 }
+

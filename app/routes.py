@@ -1,4 +1,5 @@
 from datetime import date, datetime
+import locale
 import traceback
 from app import app, mysql
 from flask import render_template, jsonify, request, redirect, url_for, session, flash
@@ -11,6 +12,8 @@ from reportlab.platypus.tables import TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 from flask import make_response
+
+locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
 
 # Decoradores para proteger rutas según el tipo de usuario
 def login_required(f):
@@ -141,7 +144,19 @@ def home():
     sql = "SELECT * FROM periodos_competencia"
     cursor.execute(sql)
     data = cursor.fetchall()
-    return render_template('home.html', data=data)
+
+    # Procesar y formatear las fechas
+    periodos = []
+    for row in data:
+        fecha_inicio = row['fecha_inicio'].strftime('%d de %B, %Y')
+        fecha_fin = row['fecha_fin'].strftime('%d de %B, %Y')
+        periodos.append({
+            'tipo_periodo': row['tipo_periodo'],
+            'fecha_inicio_formateada': fecha_inicio,
+            'fecha_fin_formateada': fecha_fin
+        })
+
+    return render_template('home.html', periodos=periodos)
 
 @app.route('/admin-areas')
 @admin_required

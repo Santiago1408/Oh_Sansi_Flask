@@ -40,22 +40,24 @@
     <div class="fechas-importantes">
         <h2>Fechas importantes</h2>
         <div class="dates">
+            {% for periodo in periodos %}
             <div class="card">
-                <h2>{{data}}</h2>
-                <p>Proceso de inscripción</p>
+                <h2>{{ periodo.fecha_inicio_formateada|capitalize }} - {{ periodo.fecha_fin_formateada|lower }}</h2>
+                <p>
+                    {% if periodo.tipo_periodo == 'inscripcion' %}
+                    Proceso de inscripción
+                    {% elif periodo.tipo_periodo == 'validacion' %}
+                    Proceso de validación de inscripción
+                    {% elif periodo.tipo_periodo == 'pagos' %}
+                    Proceso de pago de inscripción
+                    {% elif periodo.tipo_periodo == 'competencia' %}
+                    Periodo de competencia
+                    {% else %}
+                    {{ periodo.tipo_periodo|capitalize }}
+                    {% endif %}
+                </p>
             </div>
-            <div class="card">
-                <h2>21 de mayo</h2>
-                <p>Proceso de validación de inscripción</p>
-            </div>
-            <div class="card">
-                <h2>21 de junio</h2>
-                <p>Proceso de pago de inscripción</p>
-            </div>
-            <div class="card">
-                <h2>28 de junio</h2>
-                <p>Periodo de competencia</p>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </main>
