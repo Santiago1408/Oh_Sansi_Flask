@@ -6,7 +6,7 @@
 <div class="contenido">
     <div class="paneles">
       <div class="seccion1">
-        <h2>Estudiantes por validar:</h2>
+        <h2>Estudiantes pendientes de validación:</h2>
         <p>{{tutor_id}}</p>
         {%for competidor in data%}
         <div class="entrada">
@@ -22,7 +22,7 @@
         {%endfor%}
       </div>
       <div class="seccion2">
-        <h2>Mis estudiantes:</h2>
+        <h2>Estudiantes inscritos:</h2>
         {%for competidor in data2%}
         <div class="entrada">
           <label>{{competidor.nombre}} {{competidor.apellido}}</label>

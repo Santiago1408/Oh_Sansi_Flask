@@ -18,19 +18,45 @@
         </div>
     </div>
     <div class="info-olimpiadas">
-        <h2>¿Qué son las Olimpiadas en Ciencias y Tecnología?</h2>
-        <p>
-            Las Olimpiadas en Ciencias y Tecnología son un evento académico que busca fomentar el interés por las
-            ciencias y la tecnología entre los estudiantes de educación regular. A través de una serie de
-            competencias, los participantes tendrán la oportunidad de demostrar sus habilidades y conocimientos en
-            diversas áreas científicas.
-        </p>
-        <p>
-            Este evento no solo promueve el aprendizaje y la investigación, sino que también busca incentivar la
-            creatividad y el trabajo en equipo entre los estudiantes. Las Olimpiadas en Ciencias y Tecnología son
-            una excelente oportunidad para que los jóvenes se involucren en el mundo de la ciencia y la tecnología,
-            desarrollen habilidades prácticas y se preparen para futuros desafíos académicos y profesionales.
-        </p>
+        <div class="atomo">
+            <img src="{{url_for('static', filename='images/atom.webp')}}" alt="Átomo">
+        </div>
+        <div class="desc">
+            <h2>¿Qué son las Olimpiadas en Ciencias y Tecnología?</h2>
+            <p>
+                Las Olimpiadas en Ciencias y Tecnología son un evento académico que busca fomentar el interés por las
+                ciencias y la tecnología entre los estudiantes de educación regular. A través de una serie de
+                competencias, los participantes tendrán la oportunidad de demostrar sus habilidades y conocimientos en
+                diversas áreas científicas.
+            </p>
+            <p>
+                Este evento no solo promueve el aprendizaje y la investigación, sino que también busca incentivar la
+                creatividad y el trabajo en equipo entre los estudiantes. Las Olimpiadas en Ciencias y Tecnología son
+                una excelente oportunidad para que los jóvenes se involucren en el mundo de la ciencia y la tecnología,
+                desarrollen habilidades prácticas y se preparen para futuros desafíos académicos y profesionales.
+            </p>
+        </div>
+    </div>
+    <div class="fechas-importantes">
+        <h2>Fechas importantes</h2>
+        <div class="dates">
+            <div class="card">
+                <h2>{{data}}</h2>
+                <p>Proceso de inscripción</p>
+            </div>
+            <div class="card">
+                <h2>21 de mayo</h2>
+                <p>Proceso de validación de inscripción</p>
+            </div>
+            <div class="card">
+                <h2>21 de junio</h2>
+                <p>Proceso de pago de inscripción</p>
+            </div>
+            <div class="card">
+                <h2>28 de junio</h2>
+                <p>Periodo de competencia</p>
+            </div>
+        </div>
     </div>
 </main>
 {%endblock%}
