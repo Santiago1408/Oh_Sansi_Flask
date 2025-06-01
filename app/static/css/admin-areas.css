@@ -1,14 +1,15 @@
 .contenedor {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 80%;
+    margin: 0 auto;
     margin-top: 30px;
     font-family: Arial, sans-serif;
+    justify-content: space-between;
 } 
 .lista {
     background-color: #EDF3FA;
-    width: 80%;
-    padding: 30px 80px;
+    width: 55%;
+    padding: 30px 60px;
     border-radius: 10px;
     margin-bottom: 20px;
 }
@@ -38,11 +39,12 @@
     background-color: #241749;
 }
 .formulario {
-    background-color: #DCE3EB;
+    background-color: #EDF3FA;
     padding: 15px 20px;
     border-radius: 10px;
-    width: 50%;
+    width: 25%;
     margin-bottom: 50px;
+    height: 420px;
 }
 .campo{
     margin-bottom: 15px;
@@ -54,14 +56,13 @@
 
 .formulario select {
     display: block;
-    width: 400px;
+    width: 80%;
     padding: 6px 10px;
     font-size: 20px;
     border-radius: 6px;
     border: 1px solid #ccc;
 }
 .crear {
-    margin-left: auto;
     display: block;
     width: 200px;
     background-color: #1E3656;
@@ -79,7 +80,7 @@
 
 .formulario input[type="number"]{
     display: block;
-    width: 380px;
+    width: 74%;
     padding: 6px 10px;
     font-size: 20px;
     border-radius: 6px;
