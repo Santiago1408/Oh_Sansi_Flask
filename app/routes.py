@@ -446,6 +446,40 @@ def registrar_competidor():
             mensaje = ''
             
             # Validar datos importantes
+
+            import re
+            errores = []
+
+            solo_letras = re.compile(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$')
+
+            if not nombre or not solo_letras.match(nombre):
+                errores.append('El nombre no puede estar vacío y debe contener solo letras.')
+
+            if not apellido or not solo_letras.match(apellido):
+                errores.append('El apellido no puede estar vacío y debe contener solo letras.')
+
+            if not colegio or not solo_letras.match(colegio):
+                errores.append('El colegio no puede estar vacío y debe contener solo letras.')
+
+            if not provincia or not solo_letras.match(provincia):
+                errores.append('La provincia no puede estar vacía y debe contener solo letras.')
+
+            if not ci.isdigit() or len(ci) != 8:
+                errores.append('El CI debe contener solo números y tener exactamente 8 dígitos.')
+
+            if not telefono.isdigit() or len(telefono) != 8 or not telefono.startswith(('6', '7')):
+                errores.append('El teléfono debe tener exactamente 8 dígitos, solo números, y comenzar con 6 o 7.')
+
+            if not nombre or not apellido or not ci or not email or not id_tutor:
+                errores.append('Faltan datos obligatorios. Por favor completa todos los campos requeridos.')
+
+            if errores:
+               for campo, mensaje in errores:
+                flash((campo, mensaje), 'error')
+
+                return redirect(url_for('inscribirse'))
+
+
             if not nombre or not apellido or not ci or not email or not id_tutor:
                 flash('Faltan datos obligatorios. Por favor completa todos los campos requeridos.', 'danger')
                 return redirect(url_for('inscribirse'))
@@ -801,6 +835,10 @@ def rechazar_competidor():
         cursor = mysql.connection.cursor()
         sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
         cursor.execute(sql, (mensaje, id_competidor))
+
+        sql_mensaje = "UPDATE inscripcion SET mensaje = %s WHERE id_competidor = %s"
+        cursor.execute(sql_mensaje, (mensaje, id_competidor))
+
         mysql.connection.commit()
 
         flash('Competidor rechazado con mensaje registrado', 'info')
