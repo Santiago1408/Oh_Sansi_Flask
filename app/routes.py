@@ -397,7 +397,7 @@ def registrarse():
             cursor.close()
 
             flash('Usuario registrado correctamente.', 'success')
-            return redirect(url_for('registrarse'))
+            return redirect(url_for('login'))
 
         except Exception as e:
             mysql.connection.rollback()
