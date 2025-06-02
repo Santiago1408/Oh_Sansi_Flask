@@ -12,6 +12,7 @@
   <form class="selector" method="POST" action="{{ url_for('generar_reporte_pdf') }}">
     <label for="grado">NIVEL:</label>
     <select class="curso" name="grado" id="grado" required>
+      <option value="todos">Todos los niveles</option>
       <option value="3ro Primaria">3ro Primaria</option>
       <option value="4to Primaria">4to Primaria</option>
       <option value="5to Primaria">5to Primaria</option>
@@ -24,7 +25,10 @@
       <option value="6to Secundaria">6to Secundaria</option>
     </select>
 
-    <button class="Generar" type="submit">Generar Reporte</button>
+    <div class="botones">
+      <button class="Generar">Descargar Reporte</button>
+      <button class="Generar" name="accion" value="visualizar" formtarget="_blank">Visualizar Reporte</button>
+    </div>
   </form>
 </div>
 {% endblock content %}
