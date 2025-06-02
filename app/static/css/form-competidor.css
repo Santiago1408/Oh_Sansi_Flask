@@ -78,3 +78,12 @@ select{
     background-color: #00bbff;
     transition: 0.3s;
 }
+
+.error-message {
+  color: red;
+  font-size: 0.85em;
+  font-weight: 500;
+  display: block;
+  margin-top: 2px;
+}
+

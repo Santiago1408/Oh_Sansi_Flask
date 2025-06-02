@@ -8,20 +8,28 @@
     <form action="{{url_for('registrar_competidor')}}" class="campos" method="POST">
         <div class="seccion1">
             <p>Nombres: </p>
-            <input type="text" name="nombre" id="">
+            <input type="text" name="nombre" id="nombre" maxlength="50" required>
+             <span id="errorNombre" class="error-message"></span>
             <p>Apellidos: </p>
-            <input type="text" name="apellido" id="">
+            <input type="text" name="apellido" id="apellido" maxlength="50" required>
+            <span id="errorApellido" class="error-message"></span>
+
             <p>Fecha de nacimeinto: </p>
             <input type="date" name="fecha_nacimiento" id="fechaNacimiento">
             <span id="errorEdad" style="color: red; font-size: 0.9em; display:block;"></span>
             <p>Carnet de identidad:</p>
-            <input type="text" name="ci" id="">
+            <input type="text" name="ci" id="ci" maxlength="12" required>
+            <span id="errorCi" class="error-message"></span>
             <p>Correo electrónico: </p>
-            <input type="email" name="email" id="">
+            <input type="email" name="email" id="email" maxlength="100" required>
+            <span id="errorEmail" class="error-message"></span>
             <p>Número de celular: </p>
-            <input type="text" name="telefono" id="">
+            <input type="text" name="telefono" id="telefono" required>
+            <span id="errorTelefono" class="error-message"></span>
+
             <p>Colegio: </p>
-            <input type="text" name="colegio" id="">
+            <input type="text" name="colegio" id="colegio" required>
+            <span id="errorColegio" class="error-message"></span>
             <p>Curso: </p>
             <select name="curso" id="curso">
                 <option value="3ro Primaria">3ro Primaria</option>
@@ -38,7 +46,8 @@
         </div>
         <div class="seccion2">
             <p>Provincia: </p>
-            <input type="text" name="provincia" id="">
+            <input type="text" name="provincia" id="provincia" required>
+            <span id="errorProvincia" class="error-message"></span>
             <p>Departamento: </p>
             <select name="departamento" id="">
                 <option value="Cochabamba">Cochabamba</option>
@@ -336,6 +345,53 @@
             errorEdadSpan.textContent = 'La edad del competidor debe estar entre 8 y 18 años.';
             event.preventDefault(); // Evita que el formulario se envíe
         }
+    
+const nombre = document.getElementById('nombre').value.trim();
+const apellido = document.getElementById('apellido').value.trim();
+const colegio = document.getElementById('colegio').value.trim();
+const provincia = document.getElementById('provincia').value.trim();
+const ci = document.getElementById('ci').value.trim();
+const telefono = document.getElementById('telefono').value.trim();
+const email = document.getElementById('email').value.trim();
+
+let valido = true;
+
+const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+const ciRegex = /^\d{8}$/;
+const telefonoRegex = /^[67]\d{7}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function mostrarError(idCampo, mensaje) {
+    const span = document.getElementById(idCampo);
+    span.textContent = mensaje;
+    span.style.display = 'block';
+    valido = false;
+}
+
+function limpiarError(idCampo) {
+    const span = document.getElementById(idCampo);
+    span.textContent = '';
+    span.style.display = 'none';
+}
+
+nombre && soloLetras.test(nombre) ? limpiarError('errorNombre') : mostrarError('errorNombre', 'Campo Nombre es obligatorio, solo letras.');
+apellido && soloLetras.test(apellido) ? limpiarError('errorApellido') : mostrarError('errorApellido', 'Campo Apellido es obligatorio, solo letras.');
+colegio && soloLetras.test(colegio) ? limpiarError('errorColegio') : mostrarError('errorColegio', 'Campo Colegio es obligatorio, solo letras.');
+provincia && soloLetras.test(provincia) ? limpiarError('errorProvincia') : mostrarError('errorProvincia', 'Campo Provincia es obligatoria, solo letras.');
+
+// Validar CI
+ciRegex.test(ci) ? limpiarError('errorCi') : mostrarError('errorCi', 'El CI debe tener exactamente 8 dígitos.');
+
+// Validar teléfono
+telefonoRegex.test(telefono) ? limpiarError('errorTelefono') : mostrarError('errorTelefono', 'Teléfono debe iniciar con 6 o 7 y tener 8 dígitos.');
+
+// Validar email
+emailRegex.test(email) ? limpiarError('errorEmail') : mostrarError('errorEmail', 'Correo inválido.');
+
+if (!valido) {
+    event.preventDefault();
+}
+
     });
 
 </script>
