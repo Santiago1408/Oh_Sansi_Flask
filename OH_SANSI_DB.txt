@@ -39,8 +39,9 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `administrador` (
-  `id_administrador` int(11) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL
+  `id_administrador` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_administrador`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -58,8 +59,9 @@ INSERT INTO `administrador` (`id_administrador`, `id_usuario`) VALUES
 --
 
 CREATE TABLE `cajero` (
-  `id_cajero` int(11) NOT NULL,
-  `id_usuario` int(11) DEFAULT NULL
+  `id_cajero` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id_cajero`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -301,14 +303,12 @@ INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `email`, `telefono`, 
 -- Indices de la tabla `administrador`
 --
 ALTER TABLE `administrador`
-  ADD PRIMARY KEY (`id_administrador`),
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `cajero`
 --
 ALTER TABLE `cajero`
-  ADD PRIMARY KEY (`id_cajero`),
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
