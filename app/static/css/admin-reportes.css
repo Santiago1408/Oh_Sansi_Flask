@@ -55,3 +55,10 @@ body{
   .Generar:hover {
     background-color: #080213;
   }
+
+  .botones {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}

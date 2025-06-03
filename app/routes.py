@@ -737,40 +737,56 @@ def admincompetencia():
 @admin_required
 def generar_reporte_pdf():
     grado = request.form['grado'].strip()
-    print("Grado recibido:", grado)  
+    accion = request.form.get('accion', 'descargar')
+    #print("Grado recibido:", grado)  
 
     cursor = mysql.connection.cursor()
 
-    sql = """
-        SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono
-        FROM competidor
-        WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', '')) 
-          AND estado = 'registrado'
-    """
-    cursor.execute(sql, (grado,))
+    if grado.lower() == 'todos':
+        sql = """
+            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono, curso
+            FROM competidor
+            WHERE estado = 'registrado'
+            ORDER BY curso
+        """
+        cursor.execute(sql)
+    else:
+        sql = """
+            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono
+            FROM competidor
+            WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', '')) 
+            AND estado = 'registrado'
+        """
+        cursor.execute(sql, (grado,))
+
     data = cursor.fetchall()
     cursor.close()
 
-    print(f"Total filas recuperadas: {len(data)}")
+    #print(f"Total filas recuperadas: {len(data)}")
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
     elements = []
 
+    titulo = "Reporte de Competidores - Todos los niveles" if grado.lower() == 'todos' else f"Reporte de Competidores - Nivel: {grado}"
     elements.append(Paragraph(f"Reporte de Competidores - Nivel: {grado}", styles['Title']))
     elements.append(Spacer(1, 12))
 
-    table_data = [[
-        'Nombre', 'Apellido', 'CI', 'Colegio',
-        'Departamento', 'Provincia', 'Email', 'Teléfono'
-    ]]
+    if grado.lower() == 'todos':
+        table_data = [[
+            'Nombre', 'Apellido', 'CI', 'Colegio',
+            'Departamento', 'Provincia', 'Email', 'Teléfono', 'Curso'
+        ]]
+    else:
+        table_data = [[
+            'Nombre', 'Apellido', 'CI', 'Colegio',
+            'Departamento', 'Provincia', 'Email', 'Teléfono'
+        ]]
 
     if data:
         for row in data:
-            # Convertir cada celda a string, asegurando que no haya None
-            # y reemplazando None por una cadena vacía
-            table_data.append([
+            fila = [
                 str(row['nombre']) if row['nombre'] is not None else '',
                 str(row['apellido']) if row['apellido'] is not None else '',
                 str(row['ci']) if row['ci'] is not None else '',
@@ -779,7 +795,10 @@ def generar_reporte_pdf():
                 str(row['provincia']) if row['provincia'] is not None else '',
                 str(row['email']) if row['email'] is not None else '',
                 str(row['telefono']) if row['telefono'] is not None else ''
-            ])
+            ]
+            if grado.lower() == 'todos':
+                fila.append(str(row['curso']) if row['curso'] is not None else '')
+            table_data.append(fila)
             
     else:
         table_data.append(['No hay datos disponibles para este nivel'] + [''] * 8)
@@ -800,7 +819,10 @@ def generar_reporte_pdf():
     buffer.seek(0)
     response = make_response(buffer.getvalue())
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=Reporte_{grado.replace(" ", "_")}.pdf'
+
+    nombre_archivo = 'Reporte_Todos_los_niveles.pdf' if grado.lower() == 'todos' else f'Reporte_{grado.replace(" ", "_")}.pdf'
+    disposition_type = 'inline' if accion == 'visualizar' else 'attachment'
+    response.headers['Content-Disposition'] = f'{disposition_type}; filename={nombre_archivo}'
 
     return response
 
@@ -860,3 +882,4 @@ def obtener_tutores_por_area(area):
     except Exception as e:
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+    
