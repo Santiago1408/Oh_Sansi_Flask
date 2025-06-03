@@ -8,22 +8,23 @@
     <form action="{{url_for('registrar_competidor')}}" class="campos" method="POST">
         <div class="seccion1">
             <p>Nombres: </p>
-            <input type="text" name="nombre" id="">
+            <input type="text" name="nombre" id="" required>
             <p>Apellidos: </p>
-            <input type="text" name="apellido" id="">
+            <input type="text" name="apellido" id="" required>
             <p>Fecha de nacimeinto: </p>
-            <input type="date" name="fecha_nacimiento" id="fechaNacimiento">
+            <input type="date" name="fecha_nacimiento" id="fechaNacimiento" required>
             <span id="errorEdad" style="color: red; font-size: 0.9em; display:block;"></span>
             <p>Carnet de identidad:</p>
-            <input type="text" name="ci" id="">
+            <input type="text" name="ci" id="" required>
             <p>Correo electrónico: </p>
-            <input type="email" name="email" id="">
+            <input type="email" name="email" id="" required>
             <p>Número de celular: </p>
             <input type="text" name="telefono" id="">
             <p>Colegio: </p>
             <input type="text" name="colegio" id="">
             <p>Curso: </p>
-            <select name="curso" id="curso">
+            <select name="curso" id="curso" required>
+                <option value="">Seleccione un curso</option>
                 <option value="3ro Primaria">3ro Primaria</option>
                 <option value="4to Primaria">4to Primaria</option>
                 <option value="5to Primaria">5to Primaria</option>
@@ -52,18 +53,18 @@
                 <option value="Pando">Pando</option>
             </select>
             <p>Área: </p>
-            <select name="area" id="area">
+            <select name="area" id="area" required>
                 <option value="" selected disabled>Seleccione un área</option>
                 <!-- Las opciones se cargarán dinámicamente -->
             </select>
             <p>Categoría: </p>
-            <select name="categoria" id="categoria">
+            <select name="categoria" id="categoria" required>
                 <option value="" selected disabled>Seleccione una categoría</option>
                 <!-- Las opciones se cargarán dinámicamente -->
             </select>
             <h2>TUTOR</h2>
             <p>Seleccionar tutor: </p>
-            <select name="id_tutor" id="tutor">
+            <select name="id_tutor" id="tutor" required>
                 <option value="" selected disabled>Seleccione un tutor</option>
             </select> 
             <div class="tutor-info" id="tutorInfo">
@@ -91,10 +92,32 @@
         </div>
     </form>
 </div>
+
+<!-- Modal de éxito -->
+<div class="modal-exito" id="modalExito" style="display: none;">
+    <div class="contenido-modal">
+        <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+        <h2>¡Inscripción exitosa!</h2>
+        <p>Tu inscripción ha sido registrada correctamente y está pendiente de validación por tu tutor.</p>
+    </div>
+</div>
 <script>
     // Variables globales
     let todosTutores = [];
     let todasCompetencias = [];
+
+    // Función para mostrar el modal
+    function mostrarModal() {
+        document.getElementById('modalExito').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+    }
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        document.getElementById('modalExito').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restaurar scroll
+        window.location.href = "{{ url_for('home') }}";
+    }
 
     // Función para cargar los tutores por área
     function cargarTutoresPorArea(area) {
@@ -151,7 +174,7 @@
                 // Agregar cada tutor como una opción
                 tutores.forEach(tutor => {
                     const option = document.createElement('option');
-                    option.value = tutor.id_tutor; // Usamos id_tutor en lugar de id_usuario
+                    option.value = tutor.id_tutor;
                     option.textContent = `${tutor.nombre} ${tutor.apellido}`;
                     selectorTutores.appendChild(option);
                 });
@@ -194,6 +217,8 @@
         while (selectorAreas.options.length > 1) {
             selectorAreas.remove(1);
         }
+
+        if (!cursoSeleccionado) return;
 
         // Filtrar las competencias por el curso seleccionado
         const competenciasFiltradas = todasCompetencias.filter(comp => comp.grado === cursoSeleccionado);
@@ -287,6 +312,12 @@
         cargarTutores();
         cargarCompetencias();
         
+        // Verificar si hay que mostrar el modal
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('inscripcion_exitosa') === '1') {
+            mostrarModal();
+        }
+        
         // Agregar el evento change al selector de tutores
         document.getElementById('tutor').addEventListener('change', function(event) {
             const idTutorSeleccionado = event.target.value;
@@ -306,9 +337,16 @@
         document.getElementById('area').addEventListener('change', function() {
             actualizarCategoriasPorArea();
         });
+
+        // Cerrar modal al hacer clic fuera de él
+        document.getElementById('modalExito').addEventListener('click', function(event) {
+            if (event.target === this) {
+                cerrarModal();
+            }
+        });
     });
 
-        // Validación de edad antes de enviar el formulario
+    // Validación de edad antes de enviar el formulario
     document.querySelector('form.campos').addEventListener('submit', function(event) {
         const fechaNacimientoInput = document.getElementById('fechaNacimiento');
         const errorEdadSpan = document.getElementById('errorEdad');
@@ -334,9 +372,8 @@
 
         if (edad < 8 || edad > 18) {
             errorEdadSpan.textContent = 'La edad del competidor debe estar entre 8 y 18 años.';
-            event.preventDefault(); // Evita que el formulario se envíe
+            event.preventDefault();
         }
     });
-
 </script>
 {%endblock%}

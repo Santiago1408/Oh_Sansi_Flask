@@ -468,6 +468,14 @@ def registrar_competidor():
             print(f"Datos recibidos: {nombre}, {apellido}, {fecha_nacimiento}, {curso}, {area}, {categoria}, {id_tutor}")
             cursor = mysql.connection.cursor()
             
+            # Verificar si el CI ya existe
+            check_ci = "SELECT ci FROM Competidor WHERE ci = %s"
+            cursor.execute(check_ci, (ci,))
+            if cursor.fetchone():
+                cursor.close()
+                flash('El carnet de identidad ya está registrado.', 'warning')
+                return redirect(url_for('inscribirse'))
+            
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
             INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
@@ -498,7 +506,7 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia['id_competencia']  # Acceder como diccionario
+                id_competencia = competencia['id_competencia']
                 
                 # 4. Registrar la participación del competidor en la competencia
                 insert_compite = """
@@ -509,33 +517,24 @@ def registrar_competidor():
                 print(f"Competidor asociado a competencia ID: {id_competencia}")
             else:
                 print(f"No se encontró competencia con: área={area}, categoría={categoria}, grado={curso}")
-                # Hacer rollback si no se encuentra la competencia
                 mysql.connection.rollback()
+                cursor.close()
                 flash('No se encontró la competencia seleccionada. Por favor verifica los datos.', 'danger')
                 return redirect(url_for('inscribirse'))
-            
-            # 5. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
-            # Comentando esta parte porque puede que esta tabla no sea necesaria si ya tienes id_tutor en la tabla competidor
-            # o si ya tienes la tabla inscripción que relaciona ambos
-            """
-            insert_puede_tener = """
-            """INSERT INTO `Puede tener` (id_tutor, id_competidor)
-            VALUES (%s, %s)
-            """
-            """
-            cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
-            """
             
             # Confirmar los cambios en la base de datos
             mysql.connection.commit()
             cursor.close()
             
-            flash('¡Inscripción realizada con éxito! Tu registro está pendiente de validación por el tutor.', 'success')
-            # Redirigir a una página de éxito o a la página principal
-            return redirect(url_for('home'))
+            print("Inscripción completada exitosamente")
+            
+            # Redirigir al formulario con el parámetro para mostrar el modal
+            return redirect(url_for('inscribirse', inscripcion_exitosa='1'))
         
         except Exception as e:
             # En caso de error, hacer rollback y mostrar mensaje de error
+            if 'cursor' in locals():
+                cursor.close()
             mysql.connection.rollback()
             print(f'Error en el registro: {str(e)}')
             flash(f'Error al registrar competidor: {str(e)}', 'danger')
