@@ -465,16 +465,72 @@ def registrar_competidor():
                 flash('Faltan datos obligatorios. Por favor completa todos los campos requeridos.', 'danger')
                 return redirect(url_for('inscribirse'))
             
-            print(f"Datos recibidos: {nombre}, {apellido}, {fecha_nacimiento}, {curso}, {area}, {categoria}, {id_tutor}")
+            #print(f"Datos recibidos: {nombre}, {apellido}, {fecha_nacimiento}, {curso}, {area}, {categoria}, {id_tutor}")
             cursor = mysql.connection.cursor()
-            
-            # Verificar si el CI ya existe
-            check_ci = "SELECT ci FROM Competidor WHERE ci = %s"
-            cursor.execute(check_ci, (ci,))
+
+             # 1. Validar que el CI esté asociado al mismo nombre, apellido y fecha si ya existe
+            cursor.execute("""
+                SELECT id_competidor 
+                FROM Competidor 
+                WHERE ci = %s 
+                AND (nombre != %s OR apellido != %s OR fecha_nacimiento != %s)
+            """, (ci, nombre, apellido, fecha_nacimiento))
+
             if cursor.fetchone():
-                cursor.close()
-                flash('El carnet de identidad ya está registrado.', 'warning')
+                flash('Este número de carnet ya está registrado para otro competidor (con diferente nombre, apellido o fecha de nacimiento).', 'danger')
                 return redirect(url_for('inscribirse'))
+            
+            # 2. Validar que no esté registrado en más de 2 competencias (usando CI o nombre+apellido+fecha)
+            cursor.execute("""
+                SELECT COUNT(*) as count 
+                FROM Competidor c
+                JOIN compite cm ON c.id_competidor = cm.id_competidor
+                WHERE c.ci = %s 
+                AND c.nombre = %s 
+                AND c.apellido = %s 
+                AND c.fecha_nacimiento = %s
+            """, (ci, nombre, apellido, fecha_nacimiento))
+            
+            count = cursor.fetchone()['count']
+            if count >= 2:
+                flash('Este competidor ya está registrado en 2 competencias. No puede inscribirse en más.', 'danger')
+                return redirect(url_for('inscribirse'))
+            
+            # 3. Verificar si el competidor ya existe para reutilizar o crear nuevo
+            cursor.execute("""
+                SELECT id_competidor 
+                FROM Competidor 
+                WHERE ci = %s 
+                AND nombre = %s 
+                AND apellido = %s 
+                AND fecha_nacimiento = %s
+            """, (ci, nombre, apellido, fecha_nacimiento))
+            
+            competidor_existente = cursor.fetchone()
+            
+            if competidor_existente:
+                id_competidor = competidor_existente['id_competidor']
+                
+                # Actualizar datos del competidor si es necesario (manteniendo estado pendiente)
+                update_competidor = """
+                UPDATE Competidor 
+                SET colegio = %s, curso = %s, departamento = %s, provincia = %s, 
+                    email = %s, telefono = %s, estado = %s, id_tutor = %s, mensaje = %s
+                WHERE id_competidor = %s
+                """
+                cursor.execute(update_competidor, (colegio, curso, departamento, provincia, 
+                                                email, telefono, estado, id_tutor, mensaje, 
+                                                id_competidor))
+            else:
+                # Insertar nuevo competidor (manteniendo el código original)
+                insert_competidor = """
+                INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
+                                      nombre, apellido, email, telefono, estado, id_tutor, mensaje)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
+                                                 nombre, apellido, email, telefono, estado, id_tutor, mensaje))
+                id_competidor = cursor.lastrowid
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
@@ -506,35 +562,41 @@ def registrar_competidor():
             competencia = cursor.fetchone()
             
             if competencia:
-                id_competencia = competencia['id_competencia']
+                id_competencia = competencia['id_competencia']  # Acceder como diccionario
                 
-                # 4. Registrar la participación del competidor en la competencia
+                # Registrar la participación del competidor en la competencia
                 insert_compite = """
                 INSERT INTO compite (id_competencia, id_competidor)
                 VALUES (%s, %s)
                 """
                 cursor.execute(insert_compite, (id_competencia, id_competidor))
-                print(f"Competidor asociado a competencia ID: {id_competencia}")
             else:
-                print(f"No se encontró competencia con: área={area}, categoría={categoria}, grado={curso}")
                 mysql.connection.rollback()
                 cursor.close()
                 flash('No se encontró la competencia seleccionada. Por favor verifica los datos.', 'danger')
                 return redirect(url_for('inscribirse'))
             
+            # 4. Establecer la relación entre el tutor y el competidor en la tabla "Puede tener"
+            # Comentando esta parte porque puede que esta tabla no sea necesaria si ya tienes id_tutor en la tabla competidor
+            # o si ya tienes la tabla inscripción que relaciona ambos
+            """
+            insert_puede_tener = """
+            """INSERT INTO `Puede tener` (id_tutor, id_competidor)
+            VALUES (%s, %s)
+            """
+            """
+            cursor.execute(insert_puede_tener, (id_tutor, id_competidor))
+            """
             # Confirmar los cambios en la base de datos
             mysql.connection.commit()
             cursor.close()
             
-            print("Inscripción completada exitosamente")
-            
-            # Redirigir al formulario con el parámetro para mostrar el modal
-            return redirect(url_for('inscribirse', inscripcion_exitosa='1'))
+            flash('¡Inscripción realizada con éxito! Tu registro está pendiente de validación por el tutor.', 'success')
+            # Redirigir a una página de éxito o a la página principal
+            return redirect(url_for('home'))
         
         except Exception as e:
             # En caso de error, hacer rollback y mostrar mensaje de error
-            if 'cursor' in locals():
-                cursor.close()
             mysql.connection.rollback()
             print(f'Error en el registro: {str(e)}')
             flash(f'Error al registrar competidor: {str(e)}', 'danger')
@@ -837,10 +899,6 @@ def rechazar_competidor():
         cursor = mysql.connection.cursor()
         sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
         cursor.execute(sql, (mensaje, id_competidor))
-
-        sql_mensaje = "UPDATE inscripcion SET mensaje = %s WHERE id_competidor = %s"
-        cursor.execute(sql_mensaje, (mensaje, id_competidor))
-
         mysql.connection.commit()
 
         flash('Competidor rechazado con mensaje registrado', 'info')
