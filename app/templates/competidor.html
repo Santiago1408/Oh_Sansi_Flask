@@ -46,10 +46,10 @@
     </div>
 
     <div class="mensaje">
-        <label for="msg">Mensajes para mí:</label>
+        <label for="msg">Mensajes para mí: </label>
         <div class="cuadro-mensaje">
-             {% if competidor.estado == 'rechazado' and competidor.mensaje %}
-            <p style="margin: 10px;">{{ competidor.mensaje }}</p>
+             {% if competidor.estado == 'rechazado' and mensaje.mensaje%}
+            <p style="margin: 10px;">{{ mensaje.mensaje }}</p>
              {% else %}
             <p style="margin: 10px;">No tienes mensajes nuevos.</p>
              {% endif %}

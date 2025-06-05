@@ -67,7 +67,7 @@ def competidor():
     
     # Obtener los datos del competidor
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id_competidor, nombre, mensaje, apellido, estado FROM competidor WHERE id_competidor = %s", 
+    cursor.execute("SELECT id_competidor, nombre, apellido, estado FROM competidor WHERE id_competidor = %s", 
                   [session['competidor_id']])
     competidor_data = cursor.fetchone()
     
@@ -83,13 +83,14 @@ def competidor():
         WHERE cm.id_competidor = %s
     """, [session['competidor_id']])
     competencias = cursor.fetchall()
-    cursor.close()
     
-    
-    return render_template('competidor.html', 
-                          competidor=competidor_data,
-                          competencias=competencias,
-                          )
+    #Obtener mensaje de estado
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM inscripcion WHERE id_competidor = %s", [session['competidor_id']])
+    mensaje_data = cursor.fetchone()
+    print("Mensaje de estado:", mensaje_data)
+
+    return render_template('competidor.html', competidor=competidor_data, competencias=competencias, mensaje=mensaje_data)
 
 def competidor_required(f):
     @wraps(f)
@@ -458,7 +459,6 @@ def registrar_competidor():
             categoria = request.form.get('categoria', '').strip()
             id_tutor = request.form.get('id_tutor', '').strip()
             estado = 'pendiente'
-            mensaje = ''
             
             # Validar datos importantes
             if not nombre or not apellido or not ci or not email or not id_tutor:
@@ -515,31 +515,22 @@ def registrar_competidor():
                 update_competidor = """
                 UPDATE Competidor 
                 SET colegio = %s, curso = %s, departamento = %s, provincia = %s, 
-                    email = %s, telefono = %s, estado = %s, id_tutor = %s, mensaje = %s
+                    email = %s, telefono = %s, estado = %s, id_tutor = %s
                 WHERE id_competidor = %s
                 """
                 cursor.execute(update_competidor, (colegio, curso, departamento, provincia, 
-                                                email, telefono, estado, id_tutor, mensaje, 
+                                                email, telefono, estado, id_tutor, 
                                                 id_competidor))
-            else:
-                # Insertar nuevo competidor (manteniendo el código original)
-                insert_competidor = """
-                INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
-                                      nombre, apellido, email, telefono, estado, id_tutor, mensaje)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """
-                cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
-                                                 nombre, apellido, email, telefono, estado, id_tutor, mensaje))
-                id_competidor = cursor.lastrowid
+            
             
             # 1. Insertar el competidor en la tabla Competidor
             insert_competidor = """
             INSERT INTO Competidor (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
-                                  nombre, apellido, email, telefono, estado, id_tutor, mensaje)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                  nombre, apellido, email, telefono, estado, id_tutor)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(insert_competidor, (ci, fecha_nacimiento, colegio, curso, departamento, provincia, 
-                                             nombre, apellido, email, telefono, estado, id_tutor, mensaje))
+                                             nombre, apellido, email, telefono, estado, id_tutor))
             print("Competidor insertado correctamente")
             
             # Obtener el ID del competidor recién insertado
@@ -593,7 +584,7 @@ def registrar_competidor():
             
             flash('¡Inscripción realizada con éxito! Tu registro está pendiente de validación por el tutor.', 'success')
             # Redirigir a una página de éxito o a la página principal
-            return redirect(url_for('home'))
+            return redirect(url_for('inscribirse', inscripcion_exitosa='1'))
         
         except Exception as e:
             # En caso de error, hacer rollback y mostrar mensaje de error
@@ -897,8 +888,13 @@ def rechazar_competidor():
         mensaje = request.form['motivo']  
 
         cursor = mysql.connection.cursor()
-        sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
-        cursor.execute(sql, (mensaje, id_competidor))
+
+        sql_estado = "UPDATE competidor SET estado = 'rechazado' WHERE id_competidor = %s"
+        cursor.execute(sql_estado, (id_competidor,))
+
+        sql_mensaje = "UPDATE inscripcion SET mensaje = %s WHERE id_competidor = %s"
+        cursor.execute(sql_mensaje, (mensaje, id_competidor))
+
         mysql.connection.commit()
 
         flash('Competidor rechazado con mensaje registrado', 'info')
