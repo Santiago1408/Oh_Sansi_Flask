@@ -837,6 +837,10 @@ def rechazar_competidor():
         cursor = mysql.connection.cursor()
         sql = "UPDATE competidor SET estado = 'rechazado', mensaje = %s WHERE id_competidor = %s"
         cursor.execute(sql, (mensaje, id_competidor))
+
+        sql_mensaje = "UPDATE inscripcion SET mensaje = %s WHERE id_competidor = %s"
+        cursor.execute(sql_mensaje, (mensaje, id_competidor))
+
         mysql.connection.commit()
 
         flash('Competidor rechazado con mensaje registrado', 'info')
