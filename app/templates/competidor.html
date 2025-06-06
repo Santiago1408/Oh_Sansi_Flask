@@ -73,57 +73,55 @@
         }
 
         async function descargarPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-        const competenciaSelect = document.getElementById('competencia');
-        const selectedOption = competenciaSelect.options[competenciaSelect.selectedIndex];
+    const competenciaSelect = document.getElementById('competencia');
+    const selectedOption = competenciaSelect.options[competenciaSelect.selectedIndex];
 
-        const nombre = "{{ competidor.nombre }}";
-        const apellido = "{{ competidor.apellido }}";
-        const estado = "{{ competidor.estado }}";
+    const nombre = "{{ competidor.nombre }}";
+    const apellido = "{{ competidor.apellido }}";
+    const estado = "{{ competidor.estado }}";
 
-        const area = selectedOption?.dataset.area || '-';
-        const categoria = selectedOption?.dataset.categoria || '-';
-        const grado = selectedOption?.dataset.grado || '-';
-        const competenciaTexto = selectedOption?.textContent?.trim() || 'No seleccionada';
+    const area = selectedOption?.dataset.area || '-';
+    const categoria = selectedOption?.dataset.categoria || '-';
+    const grado = selectedOption?.dataset.grado || '-';
+    const competenciaTexto = selectedOption?.textContent?.trim() || 'No seleccionada';
 
+    doc.setFont("times", "bold");
+    doc.setFontSize(16);
+    doc.text("Estado de Inscripción", 105, 20, null, null, "center");
+
+    const startY = 40;
+    const rowHeight = 10;
+    const colWidth = 35; // Aumentamos el ancho de cada columna
+    const startX = 10;
+
+    const etiquetas = ["Nombre", "Apellidos", "Competencia", "Área", "Categoría", "Grado", "Estado"];
+    const valores = [nombre, apellido, competenciaTexto, area, categoria, grado, estado];
+
+    doc.setFontSize(9); // Reducimos un poco la fuente para más espacio
+
+    etiquetas.forEach((etiqueta, i) => {
+        const x = startX + i * colWidth;
+        doc.rect(x, startY, colWidth, rowHeight, "S"); 
         doc.setFont("times", "bold");
-        doc.setFontSize(16);
-        doc.text("Estado de Inscripción", 105, 20, null, null, "center");
+        doc.text(etiqueta, x + 2, startY + 7, { maxWidth: colWidth - 4 });
+    });
 
-        const startY = 35;
-        const rowHeight = 10;
-        const col1X = 20;
-        const col2X = 80;
+    valores.forEach((valor, i) => {
+        const x = startX + i * colWidth;
+        doc.rect(x, startY + rowHeight, colWidth, rowHeight * 2, "S"); // Doble altura para más texto
+        doc.setFont("times", "normal");
 
-        const datos = [
-            ["Nombre", nombre],
-            ["Apellidos", apellido],
-            ["Competencia", competenciaTexto],
-            ["Área", area],
-            ["Categoría", categoria],
-            ["Grado", grado],
-            ["Estado de Inscripción", estado]
-        ];
+        // Si el texto es largo, dividirlo automáticamente
+        const splitText = doc.splitTextToSize(valor, colWidth - 4);
+        doc.text(splitText, x + 2, startY + rowHeight + 5, { maxWidth: colWidth - 4 });
+    });
 
-        doc.setFontSize(12);
+    doc.save(`estado_inscripcion_${nombre}_${apellido}.pdf`);
+}
 
-        datos.forEach((fila, i) => {
-            const y = startY + i * rowHeight;
-
-            doc.rect(col1X, y - 6, 55, rowHeight, "S"); 
-            doc.rect(col2X, y - 6, 100, rowHeight, "S"); 
-
-            doc.setFont("times", "bold");
-            doc.text(fila[0], col1X + 2, y);
-
-            doc.setFont("times", "normal");
-            doc.text(fila[1], col2X + 2, y);
-        });
-
-        doc.save(`estado_inscripcion_${nombre}_${apellido}.pdf`);
-    }
     </script>
 </body>
 </html>
