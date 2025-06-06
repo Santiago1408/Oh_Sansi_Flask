@@ -790,24 +790,29 @@ def admincompetencia():
 @admin_required
 def generar_reporte_pdf():
     grado = request.form['grado'].strip()
-    accion = request.form.get('accion', 'descargar')
-    #print("Grado recibido:", grado)  
+    print("Grado recibido:", grado)  
 
     cursor = mysql.connection.cursor()
 
-    if grado.lower() == 'todos':
+    if grado == "todos_estados":
         sql = """
-            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono, curso
+            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono, estado, curso
+            FROM competidor
+            ORDER BY estado, curso, nombre, apellido
+        """
+        cursor.execute(sql)
+    elif grado == "todos":
+        sql = """
+            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono, estado, curso
             FROM competidor
             WHERE estado = 'registrado'
-            ORDER BY curso
         """
         cursor.execute(sql)
     else:
         sql = """
-            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono
+            SELECT nombre, apellido, ci, colegio, departamento, provincia, email, telefono, estado, curso
             FROM competidor
-            WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', '')) 
+            WHERE LOWER(REPLACE(curso, ' ', '')) = LOWER(REPLACE(%s, ' ', ''))
             AND estado = 'registrado'
         """
         cursor.execute(sql, (grado,))
@@ -815,66 +820,109 @@ def generar_reporte_pdf():
     data = cursor.fetchall()
     cursor.close()
 
-    #print(f"Total filas recuperadas: {len(data)}")
+    print(f"Total filas recuperadas: {len(data)}")
 
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=letter,
+        leftMargin=20,
+        rightMargin=20,
+        topMargin=30,
+        bottomMargin=30
+    )
     styles = getSampleStyleSheet()
     elements = []
 
-    titulo = "Reporte de Competidores - Todos los niveles" if grado.lower() == 'todos' else f"Reporte de Competidores - Nivel: {grado}"
-    elements.append(Paragraph(f"Reporte de Competidores - Nivel: {grado}", styles['Title']))
+    if grado == "todos_estados":
+        titulo = "Reporte Completo - Todos los Competidores"
+    elif grado == "todos":
+        titulo = "Reporte de Competidores - Todos los Niveles"
+    else:
+        titulo = f"Reporte de Competidores - Nivel: {grado}"
+    
+    elements.append(Paragraph(titulo, styles['Title']))
     elements.append(Spacer(1, 12))
 
-    if grado.lower() == 'todos':
+    if grado in ["todos_estados", "todos"]:
         table_data = [[
-            'Nombre', 'Apellido', 'CI', 'Colegio',
-            'Departamento', 'Provincia', 'Email', 'Teléfono', 'Curso'
+            'Nombre', 'Apellido', 'CI', 'Curso', 'Colegio',
+            'Departamento', 'Provincia', 'Email', 'Teléfono', 'Estado'
         ]]
     else:
         table_data = [[
             'Nombre', 'Apellido', 'CI', 'Colegio',
-            'Departamento', 'Provincia', 'Email', 'Teléfono'
+            'Departamento', 'Provincia', 'Email', 'Teléfono', 'Estado'
         ]]
 
     if data:
         for row in data:
-            fila = [
-                str(row['nombre']) if row['nombre'] is not None else '',
-                str(row['apellido']) if row['apellido'] is not None else '',
-                str(row['ci']) if row['ci'] is not None else '',
-                str(row['colegio']) if row['colegio'] is not None else '',
-                str(row['departamento']) if row['departamento'] is not None else '',
-                str(row['provincia']) if row['provincia'] is not None else '',
-                str(row['email']) if row['email'] is not None else '',
-                str(row['telefono']) if row['telefono'] is not None else ''
-            ]
-            if grado.lower() == 'todos':
-                fila.append(str(row['curso']) if row['curso'] is not None else '')
-            table_data.append(fila)
-            
+            if grado in ["todos_estados", "todos"]:
+                table_data.append([
+                    str(row['nombre']) if row['nombre'] is not None else '',
+                    str(row['apellido']) if row['apellido'] is not None else '',
+                    str(row['ci']) if row['ci'] is not None else '',
+                    str(row['curso']) if row['curso'] is not None else '',
+                    str(row['colegio']) if row['colegio'] is not None else '',
+                    str(row['departamento']) if row['departamento'] is not None else '',
+                    str(row['provincia']) if row['provincia'] is not None else '',
+                    str(row['email']) if row['email'] is not None else '',
+                    str(row['telefono']) if row['telefono'] is not None else '',
+                    str(row['estado']) if row['estado'] is not None else ''
+                ])
+            else:
+                table_data.append([
+                    str(row['nombre']) if row['nombre'] is not None else '',
+                    str(row['apellido']) if row['apellido'] is not None else '',
+                    str(row['ci']) if row['ci'] is not None else '',
+                    str(row['colegio']) if row['colegio'] is not None else '',
+                    str(row['departamento']) if row['departamento'] is not None else '',
+                    str(row['provincia']) if row['provincia'] is not None else '',
+                    str(row['email']) if row['email'] is not None else '',
+                    str(row['telefono']) if row['telefono'] is not None else '',
+                    str(row['estado']) if row['estado'] is not None else ''
+                ])
     else:
-        table_data.append(['No hay datos disponibles para este nivel'] + [''] * 8)
+        if grado == "todos_estados":
+            mensaje = 'No hay competidores en el sistema'
+        elif grado == "todos":
+            mensaje = 'No hay competidores registrados'
+        else:
+            mensaje = f'No hay competidores registrados para {grado}'
+        
+        num_columnas = 10 if grado in ["todos_estados", "todos"] else 9
+        table_data.append([mensaje] + [''] * (num_columnas - 1))
 
     table = Table(table_data, repeatRows=1)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.black),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-    ]))
-
+    
+    table_style = [
+        ('BACKGROUND', (0, 0), (-1, 0), colors.black),  
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),   
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),            
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  
+        ('FONTSIZE', (0, 0), (-1, -1), 7),              
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white), 
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),            
+    ]
+    
+    table.setStyle(TableStyle(table_style))
     elements.append(table)
+
     doc.build(elements)
 
     buffer.seek(0)
     response = make_response(buffer.getvalue())
     response.headers['Content-Type'] = 'application/pdf'
-
-    nombre_archivo = 'Reporte_Todos_los_niveles.pdf' if grado.lower() == 'todos' else f'Reporte_{grado.replace(" ", "_")}.pdf'
+    accion = request.form.get('accion', 'descargar')
     disposition_type = 'inline' if accion == 'visualizar' else 'attachment'
+    
+    if grado == "todos_estados":
+        nombre_archivo = "Reporte_Completo_Todos_Estados.pdf"
+    elif grado == "todos":
+        nombre_archivo = "Reporte_Todos_Niveles_Registrados.pdf"
+    else:
+        nombre_archivo = f"Reporte_{grado.replace(' ', '_')}.pdf"
+    
     response.headers['Content-Disposition'] = f'{disposition_type}; filename={nombre_archivo}'
 
     return response
