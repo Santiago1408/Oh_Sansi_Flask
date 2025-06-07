@@ -2,15 +2,7 @@
 {%block title%}Administrar Competencia{%endblock%}
 {%block content%}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-competencia.css') }}">
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+
 
 <form method="POST" action="{{ url_for('admincompetencia') }}">
 <div class="contenido">
@@ -74,5 +66,29 @@
   <div class="contenedor-boton">
     <button class="boton" type="submit">Guardar</button>
   </div>
+  <script>
+  function cerrarModal() {
+    document.getElementById("modalExito").style.display = "none";
+  }
+
+  window.onload = function() {
+    {% if exito %}
+    document.getElementById("modalExito").style.display = "block";
+    {% endif %}
+  }
+</script>
+
+
   </form>
+  <!-- Modal de éxito -->
+<div class="modal-exito" id="modalExito" style="display: none;">
+    <div class="contenido-modal">
+        <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+        <h2>¡Éxito!</h2>
+        <p>Las fechas de los periodos de inscripción se guardaron correctamente.</p>
+    </div>
+</div>
+
+
+
 {%endblock content%}

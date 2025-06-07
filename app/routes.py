@@ -709,28 +709,23 @@ def verificar_fecha_sistema():
 @app.route('/admin-competencia', methods=['GET', 'POST'])
 @admin_required
 def admincompetencia():
-    # Obtener fechas actuales para mostrar en el formulario
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM periodos_competencia")
     periodos = cursor.fetchall()
-    
-    # Inicializar fechas con valores vacíos
+
     fechas = {
         'inscripcion': {'inicio': '', 'fin': ''},
         'validacion': {'inicio': '', 'fin': ''},
         'pagos': {'inicio': '', 'fin': ''},
         'competencia': {'inicio': '', 'fin': ''}
     }
-    
-    # Llenar con los valores de la BD si existen
+
     for p in periodos:
         if p['fecha_inicio']:
-            # Convertir a formato YYYY-MM-DD (formato que usa input type="date")
             fecha_inicio = p['fecha_inicio'].strftime('%Y-%m-%d') if isinstance(p['fecha_inicio'], (date, datetime)) else ''
             fechas[p['tipo_periodo']]['inicio'] = fecha_inicio
-        
+
         if p['fecha_fin']:
-            # Convertir a formato YYYY-MM-DD
             fecha_fin = p['fecha_fin'].strftime('%Y-%m-%d') if isinstance(p['fecha_fin'], (date, datetime)) else ''
             fechas[p['tipo_periodo']]['fin'] = fecha_fin
 
@@ -742,49 +737,48 @@ def admincompetencia():
                 'pagos': {'inicio': 'fechaIniPag', 'fin': 'fechaFinPag'},
                 'competencia': {'inicio': 'fechaIniComp', 'fin': 'fechaFinComp'}
             }
-            
+
             for tipo, campos in periodos_form.items():
                 fecha_inicio_str = request.form.get(campos['inicio'])
                 fecha_fin_str = request.form.get(campos['fin'])
-                
+
                 if fecha_inicio_str and fecha_fin_str:
                     try:
-                        # Convertir de YYYY-MM-DD (formato de input date) a objeto date
                         fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
                         fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
-                        
+
                         if fecha_fin < fecha_inicio:
                             flash(f'Error en {tipo}: La fecha fin no puede ser menor que la fecha inicio', 'danger')
                             continue
-                            
+
                         cursor.execute("""
                             INSERT INTO periodos_competencia (tipo_periodo, fecha_inicio, fecha_fin)
                             VALUES (%s, %s, %s)
                             ON DUPLICATE KEY UPDATE
                                 fecha_inicio = VALUES(fecha_inicio),
                                 fecha_fin = VALUES(fecha_fin)
-                            """, 
-                            (tipo, fecha_inicio, fecha_fin))
-                            
-                        # Actualizar para mostrar en el form
+                        """, (tipo, fecha_inicio, fecha_fin))
+
                         fechas[tipo]['inicio'] = fecha_inicio_str
                         fechas[tipo]['fin'] = fecha_fin_str
-                        
+
                     except ValueError:
                         flash(f'Formato de fecha inválido para {tipo}', 'danger')
-            
+
             mysql.connection.commit()
-            flash('Fechas actualizadas correctamente', 'success')
-            
+            cursor.close()
+            return redirect(url_for('admincompetencia', exito=1))  # 🔁 Redirección con parámetro
+
         except Exception as e:
             mysql.connection.rollback()
             flash(f'Error al actualizar fechas: {str(e)}', 'danger')
-        finally:
             cursor.close()
-            return render_template('admin-competencia.html', fechas=fechas)
-    
+            return render_template('admin-competencia.html', fechas=fechas, exito=False)
+
+    # 👇 Detectar si viene el parámetro "exito" para mostrar el modal
+    exito = request.args.get('exito') == '1'
     cursor.close()
-    return render_template('admin-competencia.html', fechas=fechas)
+    return render_template('admin-competencia.html', fechas=fechas, exito=exito)
 
 @app.route('/generar-reporte-pdf', methods=['POST'])
 @admin_required
