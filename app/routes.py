@@ -43,8 +43,9 @@ def cajero_required(f):
         
         permitido, mensaje, _, _ = verificar_periodo('pagos')
         if not permitido:
-            flash(mensaje, 'warning')
+            session['restriccion_global'] = mensaje
             return redirect(url_for('home'))
+
             
         return f(*args, **kwargs)
     return decorated_function
@@ -133,8 +134,9 @@ def periodo_requerido(tipo_periodo):
         def decorated_function(*args, **kwargs):
             permitido, mensaje, inicio, fin = verificar_periodo(tipo_periodo)
             if not permitido and "fuera de periodo" in mensaje:
-                flash(mensaje, 'warning')
+                session['restriccion_global'] = mensaje
                 return redirect(url_for('home'))
+
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -222,8 +224,9 @@ def validar_competidor():
     # Verificar primero si estamos en período de validación
     permitido, mensaje, _, _ = verificar_periodo('validacion')
     if not permitido:
-        flash(mensaje, 'warning')
+        session['restriccion_global'] = mensaje
         return redirect(url_for('tutor'))
+
 
     try:
         id_competidor = request.form['id_competidor']
@@ -262,13 +265,15 @@ def inscribirse():
     render_template('form-competidor.html')
     permitido, mensaje, inicio, fin = verificar_periodo('inscripcion')
     if not permitido:
-        flash(mensaje, 'warning')
+        session['restriccion_global'] = mensaje
         return redirect(url_for('home'))
+
     
     en_competencia, msg_comp, _, _ = verificar_periodo('competencia')
     if en_competencia and "En período" in msg_comp:
-        flash('No se puede inscribir durante la competencia', 'danger')
+        session['restriccion_global'] = 'No se puede inscribir durante la competencia.'
         return redirect(url_for('home'))
+
     
     return render_template('form-competidor.html')
 
@@ -681,27 +686,27 @@ def eliminar_competencia():
 #esta funcion bloquea todas las demas mientras se esta en el periodo de competicion
 @app.before_request
 def verificar_fecha_sistema():
-    # Excluir rutas que deben estar disponibles siempre
     excluded_routes = ['login', 'logout', 'home', 'static', 'admincompetencia']
-    if request.endpoint in excluded_routes:
+    if request.endpoint in excluded_routes or request.endpoint is None:
         return
-    
+
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT fecha_inicio, fecha_fin FROM periodos_competencia WHERE tipo_periodo = 'competencia'")
         competencia = cursor.fetchone()
         cursor.close()
-        
+
         if competencia:
             hoy_sistema = datetime.now().date()
             inicio_competencia = competencia['fecha_inicio']
             fin_competencia = competencia['fecha_fin']
-            
+
             if inicio_competencia <= hoy_sistema <= fin_competencia:
-                flash('El sistema está en período de competencia. Acciones restringidas.', 'danger')
-                return redirect(url_for('home'))
+                # Guardar un mensaje de periodo bloqueado en sesión
+                session['restriccion_global'] = 'Estamos en período de competencia. Algunas acciones están restringidas.'
     except Exception as e:
         print(f"Error al verificar fecha del sistema: {str(e)}")
+
 
 
 
