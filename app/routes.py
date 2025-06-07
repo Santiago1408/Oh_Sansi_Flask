@@ -40,15 +40,9 @@ def cajero_required(f):
         if 'user_id' not in session or session['rol'] != 'cajero':
             flash('No tienes permisos para acceder a esta página', 'error')
             return redirect(url_for('home'))
-        
-        permitido, mensaje, _, _ = verificar_periodo('pagos')
-        if not permitido:
-            session['restriccion_global'] = mensaje
-            return redirect(url_for('home'))
-
-            
         return f(*args, **kwargs)
     return decorated_function
+
 
 def tutor_required(f):
     @wraps(f)
@@ -183,22 +177,25 @@ def cajero():
 
 @app.route('/confirmar-pago', methods=['POST'])
 @cajero_required
-@periodo_requerido('pagos')
 def confirmar_pago():
+    permitido, mensaje, _, _ = verificar_periodo('pagos')
+    if not permitido:
+        session['restriccion_global'] = mensaje
+        return redirect(url_for('cajero'))
+
     try:
         id_competidor = request.form['id_competidor']
-        print("ID Competidor:", id_competidor)
         cursor = mysql.connection.cursor()
         sql = "UPDATE competidor SET estado = 'registrado' WHERE id_competidor = %s"
         cursor.execute(sql, (id_competidor,))
         mysql.connection.commit()
-        
         flash('Pago confirmado correctamente', 'success')
     except Exception as e:
         mysql.connection.rollback()
         flash(f'Error al confirmar el pago: {str(e)}', 'danger')
-    
+
     return redirect(url_for('cajero'))
+
 
 
 @app.route('/tutor')
@@ -930,9 +927,14 @@ def generar_reporte_pdf():
 @app.route('/rechazar_competidor', methods=['POST'])
 @tutor_required
 def rechazar_competidor():
+    permitido, mensaje, _, _ = verificar_periodo('validacion')
+    if not permitido:
+        session['restriccion_global'] = mensaje
+        return redirect(url_for('tutor'))
+
     try:
         id_competidor = request.form['id_competidor']
-        mensaje = request.form['motivo']  
+        mensaje_rechazo = request.form['motivo']  
 
         cursor = mysql.connection.cursor()
 
@@ -940,7 +942,7 @@ def rechazar_competidor():
         cursor.execute(sql_estado, (id_competidor,))
 
         sql_mensaje = "UPDATE inscripcion SET mensaje = %s WHERE id_competidor = %s"
-        cursor.execute(sql_mensaje, (mensaje, id_competidor))
+        cursor.execute(sql_mensaje, (mensaje_rechazo, id_competidor))
 
         mysql.connection.commit()
 
@@ -950,6 +952,7 @@ def rechazar_competidor():
         flash(f'Error al rechazar el competidor: {str(e)}', 'danger')
     
     return redirect(url_for('tutor'))
+
 
 @app.route('/obtener_tutores_por_area/<string:area>')
 def obtener_tutores_por_area(area):

@@ -38,5 +38,24 @@
             </div>
         </div>
     </div>
+    {% if session.get('restriccion_global') %}
+  <div id="modalPeriodo" class="modal">
+    <div class="modal-contenido">
+      <span class="cerrar" onclick="cerrarModal()">&times;</span>
+      <h2>Acción no permitida</h2>
+      <p>{{ session['restriccion_global'] }}</p>
+    </div>
+  </div>
+
+  <script>
+    function cerrarModal() {
+      document.getElementById("modalPeriodo").style.display = "none";
+    }
+    window.onload = function() {
+      document.getElementById("modalPeriodo").style.display = "block";
+    };
+  </script>
+{% endif %}
+
 </main>
 {% endblock %}
