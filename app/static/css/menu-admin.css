@@ -35,6 +35,12 @@ a{
     margin-right: 10px;
 }
 
+nav{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 nav a{
     font-weight: 400;
     padding: 0 40px;
@@ -58,15 +64,25 @@ body{
 
 i{
     font-size: 25px;
-    margin-right: 40px;
+    padding-right: 10px;
+}
+
+.usuario-admin{
+    font-weight: bolder;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #00bbff;
+    color: #fff;
+    margin-right: 20px;
 }
 
 #admin{
+    color: #fff;
     padding: 0 10px;
 }
 
 #admin:hover{
-    color:#000;
+    color:#fff;
     cursor: default;
 }
 
