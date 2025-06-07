@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,19 +8,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menu-home.css') }}">
     <title>{%block title%} {%endblock title%}</title>
 </head>
+
 <body>
     <header>
         <div class="logo">
             <img src="{{url_for('static', filename='images/logo-sansi.png')}}" alt="">
-            <h1 class="oh-sansi"><a href="{{url_for('home')}}">Oh<span style="color:rgb(191, 0, 0)">!</span> Sansi</a></h1>
+            <h1 class="oh-sansi"><a href="{{url_for('home')}}">Oh<span style="color:rgb(191, 0, 0)">!</span> Sansi</a>
+            </h1>
         </div>
         <nav>
-            <a href="{{url_for('login')}}" class="nav-link">Iniciar sesión</a>
-            <a href="{{url_for('registrarse')}}" class="nav-link">Crear cuenta</a>
-        
+            {% if session.get('user_id') or session.get('competidor_id') %}
+            <a href="{{ url_for('logout') }}" class="nav-link">Cerrar sesión</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="nav-link">Iniciar sesión</a>
+            <a href="{{ url_for('registrarse') }}" class="nav-link">Crear cuenta</a>
+            {% endif %}
+            {% if session.get('nombre') %}
+            <span class="nav-user">Bienvenido/a, {{ session['nombre'] }}</span>
+            {% endif %}
+
         </nav>
+
     </header>
     {% block content %}
     {% endblock %}
 </body>
+
 </html>

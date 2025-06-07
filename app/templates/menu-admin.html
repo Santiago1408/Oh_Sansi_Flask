@@ -17,6 +17,12 @@
             <a href="{{url_for('adminareas')}}" class="{% if request.path == url_for('adminareas') %}active{% endif %}">Competencias</a>
             <a href="{{url_for('adminreportes')}}" class="{% if request.path == url_for('adminreportes') %}active{% endif %}">Reportes</a>
             <a href="{{url_for('admincompetencia')}}" class="{% if request.path == url_for('admincompetencia') %}active{% endif %}">Olimpiada</a>
+            {% if session.get('user_id') or session.get('competidor_id') %}
+            <a href="{{ url_for('logout') }}" class="nav-link">Cerrar sesión</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="nav-link">Iniciar sesión</a>
+            <a href="{{ url_for('registrarse') }}" class="nav-link">Crear cuenta</a>
+            {% endif %}
             <a href="" id="admin">Admin</a>
             <i class="fa-solid fa-circle-user"></i>
         </nav>

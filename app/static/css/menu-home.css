@@ -48,3 +48,10 @@ nav a:hover {
     font-weight: 700;
     transition: 0.8s;
 }
+
+.nav-user {
+    font-weight: bold;
+    margin-right: 20px;
+    font-size: 18px;
+    color: #333;
+}
