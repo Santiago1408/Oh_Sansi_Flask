@@ -61,6 +61,7 @@
         </div>
     </div>
     {% if session.get('restriccion_global') %}
+  <!-- Modal -->
   <div id="modalPeriodo" class="modal">
     <div class="modal-contenido">
       <span class="cerrar" onclick="cerrarModal()">&times;</span>
@@ -73,11 +74,15 @@
     function cerrarModal() {
       document.getElementById("modalPeriodo").style.display = "none";
     }
+
     window.onload = function() {
       document.getElementById("modalPeriodo").style.display = "block";
     };
   </script>
+
+  {% set _ = session.pop('restriccion_global') %}
 {% endif %}
+
 
 </main>
 {%endblock%}

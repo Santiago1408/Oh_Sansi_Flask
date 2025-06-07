@@ -687,22 +687,10 @@ def verificar_fecha_sistema():
     if request.endpoint in excluded_routes or request.endpoint is None:
         return
 
-    try:
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT fecha_inicio, fecha_fin FROM periodos_competencia WHERE tipo_periodo = 'competencia'")
-        competencia = cursor.fetchone()
-        cursor.close()
+    # No seteamos ningún mensaje aquí para evitar mostrar el modal en páginas normales
+    # Las restricciones de período se deben manejar solo dentro de funciones específicas
+    return
 
-        if competencia:
-            hoy_sistema = datetime.now().date()
-            inicio_competencia = competencia['fecha_inicio']
-            fin_competencia = competencia['fecha_fin']
-
-            if inicio_competencia <= hoy_sistema <= fin_competencia:
-                # Guardar un mensaje de periodo bloqueado en sesión
-                session['restriccion_global'] = 'Estamos en período de competencia. Algunas acciones están restringidas.'
-    except Exception as e:
-        print(f"Error al verificar fecha del sistema: {str(e)}")
 
 
 
