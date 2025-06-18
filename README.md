@@ -41,3 +41,15 @@ Para la base de datos las instrucciones se encuentran en intrucciones-bd.txt y O
 
 ```python run.py```
 
+
+
+
+Integrantes del equipo:
+- Aliaga Garcia Edilson
+- Garcia Gamez Josue Santiago
+- Huanca Zubieta Nilson Erwin
+- Larrea Jimenez Fernanda
+- Pickman Arce Juaquin Daniel
+- Ramos Gamarra Florencia
+- Torrico Santiestevez Milena Maya
+
